@@ -1,0 +1,28 @@
+{
+  "name": "oracle-cloud-supplier-automation",
+  "version": "1.0.0",
+  "description": "Playwright automation framework for creating a new Supplier in Oracle Cloud SaaS (Procurement)",
+  "type": "module",
+  "scripts": {
+    "test": "playwright test",
+    "test:supplier": "playwright test tests/createSupplier.spec.js",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "report": "playwright show-report",
+    "codegen": "playwright codegen"
+  },
+  "keywords": [
+    "playwright",
+    "oracle-cloud",
+    "oracle-fusion",
+    "supplier",
+    "procurement",
+    "automation"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.48.0",
+    "dotenv": "^16.4.5"
+  }
+}

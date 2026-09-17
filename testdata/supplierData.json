@@ -1,0 +1,33 @@
+{
+  "supplier": {
+    "namePrefix": "AUTO_TEST_SUPPLIER",
+    "businessRelationship": "Spend Authorized",
+    "taxOrganizationType": "Corporation",
+    "taxCountry": "India",
+    "taxRegistrationNumber": "29ABCDE1234F1Z5",
+    "supplierType": "Services"
+  },
+  "address": {
+    "addressName": "Head Office",
+    "country": "India",
+    "addressLine1": "Plot 100, Test Industrial Area",
+    "city": "Bengaluru",
+    "state": "Karnataka",
+    "postalCode": "560001",
+    "purposes": {
+      "purchasing": true,
+      "remitTo": true
+    }
+  },
+  "site": {
+    "siteName": "Head Office",
+    "address": "Head Office",
+    "receiptRouting": "Direct"
+  },
+  "contact": {
+    "firstName": "Automation",
+    "lastName": "User",
+    "email": "automation@example.com",
+    "administrativeContact": true
+  }
+}

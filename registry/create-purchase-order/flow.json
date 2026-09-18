@@ -1,0 +1,120 @@
+{
+  "id": "create-purchase-order",
+  "name": "Create Purchase Order",
+  "module": "Procurement",
+  "order": 30,
+  "description": "Creates a purchase order with one line and submits it for approval.",
+  "rowLabelField": "description",
+  "captures": [
+    {
+      "name": "orderNumber",
+      "description": "The purchase order number generated on save or submit."
+    },
+    {
+      "name": "orderStatus",
+      "description": "The order status after submit."
+    }
+  ],
+  "fields": [
+    {
+      "name": "description",
+      "label": "Order Description",
+      "required": true,
+      "example": "AUTO_TEST_PO"
+    },
+    {
+      "name": "businessUnit",
+      "label": "Procurement BU",
+      "required": true,
+      "example": "US1 Business Unit"
+    },
+    {
+      "name": "supplier",
+      "label": "Supplier",
+      "required": true,
+      "example": "AUTO_TEST_SUPPLIER"
+    },
+    {
+      "name": "supplierSite",
+      "label": "Supplier Site",
+      "required": true,
+      "example": "Head Office"
+    },
+    {
+      "name": "buyer",
+      "label": "Buyer",
+      "required": false,
+      "note": "Leave blank to accept the signed-in user."
+    },
+    {
+      "name": "currency",
+      "label": "Currency",
+      "required": false,
+      "default": "USD",
+      "example": "USD"
+    },
+    {
+      "name": "lineType",
+      "label": "Line Type",
+      "required": false,
+      "default": "Goods",
+      "example": "Goods"
+    },
+    {
+      "name": "itemDescription",
+      "label": "Item Description",
+      "required": true,
+      "example": "Automation test item"
+    },
+    {
+      "name": "category",
+      "label": "Category Name",
+      "required": true,
+      "example": "Miscellaneous"
+    },
+    {
+      "name": "quantity",
+      "label": "Quantity",
+      "required": true,
+      "type": "number",
+      "example": "10"
+    },
+    {
+      "name": "uom",
+      "label": "UOM",
+      "required": true,
+      "example": "Each"
+    },
+    {
+      "name": "price",
+      "label": "Price",
+      "required": true,
+      "type": "number",
+      "example": "100"
+    },
+    {
+      "name": "needByDate",
+      "label": "Need-by Date",
+      "required": true,
+      "generated": "today+7",
+      "autofill": "token",
+      "example": "AUTO"
+    },
+    {
+      "name": "shipToLocation",
+      "label": "Ship-to Location",
+      "required": true,
+      "example": "Seattle"
+    },
+    {
+      "name": "billToLocation",
+      "label": "Bill-to Location",
+      "required": false
+    },
+    {
+      "name": "paymentTerms",
+      "label": "Payment Terms",
+      "required": false
+    }
+  ]
+}

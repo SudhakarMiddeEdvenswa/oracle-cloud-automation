@@ -1,0 +1,37 @@
+# PO Receipt — detailed steps
+#
+# This flow has no flow.js, so every step below is executed by the AI agent
+# straight from this prose. The navigation described here follows standard
+# Oracle Fusion Cloud paths — adjust the wording to match your own pod's
+# menus, labels and approval process, and the agent follows the change on the
+# next run. Once a step settles, its learned action sequence is cached in
+# healed-steps.json and replayed without a model call.
+#
+# {{placeholders}} are replaced with the current CSV row's values.
+
+[login scope=session] Log in to the application
+Open the application URL and sign in with the supplied user name and password.
+Expected: The application home page is displayed.
+
+[open-receiving scope=session] Open the Receiving work area
+Open the Navigator menu, go to Inventory Management, and open Receiving.
+Expected: The Receiving work area is displayed.
+
+[find-receipt] Find the receipt
+Set the organization to {{organization}} if asked. Use Manage Receipts to search for receipt {{receiptNumber}}, then open it.
+Expected: Receipt {{receiptNumber}} is displayed.
+
+[review-receipt] Review the receipt against the order
+Confirm the receipt is against purchase order {{orderNumber}} and read the received quantity on line {{lineNumber}}. Store that quantity as receivedQuantity.
+Expected: The receipt shows order {{orderNumber}} and a received quantity.
+
+[complete-put-away optional] Complete the put-away or inspection
+If the receipt routing leaves the line awaiting a further transaction, complete it:
+  For Inspection Required, inspect line {{lineNumber}} with result {{inspectionResult}}.
+  For Standard Receipt, put away {{putAwayQuantity}} into Subinventory {{subinventory}} and Locator {{locator}}.
+Submit the transaction and store the outcome as putAwayStatus. If the routing is Direct Delivery and nothing is pending, store "not required" as putAwayStatus and finish.
+Expected: Any pending receiving transaction is completed, or none was required.
+
+[verify-on-order] Check the quantity on the purchase order
+Open purchase order {{orderNumber}} and read the received quantity on line {{lineNumber}}.
+Expected: The order line shows the quantity that was received.

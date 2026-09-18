@@ -1,0 +1,2 @@
+orderNumber,lineNumber,newQuantity,newPrice,newNeedByDate,newDescription,changeReason
+1000123,1,15,95,,,Quantity revision

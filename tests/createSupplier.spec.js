@@ -9,7 +9,7 @@ import { AddressPage } from '../src/pages/AddressPage.js';
 import { SitePage } from '../src/pages/SitePage.js';
 import { ContactPage } from '../src/pages/ContactPage.js';
 
-import { getSupplierTestData } from '../src/utils/testDataReader.js';
+import { getSupplierTestDataRows } from '../src/utils/testDataReader.js';
 import { uniqueSupplierName, uniqueTaxRegistrationNumber } from '../src/utils/dataGenerator.js';
 import { env } from '../src/utils/env.js';
 import { logger } from '../src/utils/logger.js';
@@ -19,13 +19,18 @@ import { logger } from '../src/utils/logger.js';
  * Implements the 21-step flow described in
  * Create_New_Supplier_AI_Automation_prompt.md.
  */
-test.describe('Oracle Cloud — Create New Supplier (E2E)', () => {
-  test('creates a supplier and validates it end-to-end', async ({ page }) => {
-    const data = getSupplierTestData();
+// One test case per row of testdata/supplierData.csv.
+const supplierRows = getSupplierTestDataRows();
 
+test.describe('Oracle Cloud — Create New Supplier (E2E)', () => {
+  supplierRows.forEach((data, rowIndex) => {
+  test(`creates a supplier and validates it end-to-end [row ${rowIndex + 1}]`, async ({ page }) => {
     // Runtime variables captured/generated during the run (unique per execution).
-    const supplierName = uniqueSupplierName(data.supplier.namePrefix);
-    const taxRegistrationNumber = uniqueTaxRegistrationNumber();
+    // Append a timestamp (and row index) to the CSV supplier name so re-runs and
+    // multiple rows never collide, e.g. "AUTO_TEST_SUPPLIER_20260918023615".
+    const supplierName = uniqueSupplierName(data.supplier.namePrefix) +
+      (supplierRows.length > 1 ? `_R${rowIndex + 1}` : '');
+    const taxRegistrationNumber = uniqueTaxRegistrationNumber('29', rowIndex);
     let SUPPLIER_NUMBER = '';
 
     logger.info(`Generated supplier name: ${supplierName}`);
@@ -128,5 +133,6 @@ test.describe('Oracle Cloud — Create New Supplier (E2E)', () => {
     await contactPage.expectContactListed(data.contact);
 
     logger.pass(`TEST PASS — Supplier "${supplierName}" (#${SUPPLIER_NUMBER}) validated`);
+  });
   });
 });

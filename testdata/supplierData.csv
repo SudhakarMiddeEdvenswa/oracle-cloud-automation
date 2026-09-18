@@ -1,0 +1,2 @@
+supplierName,businessRelationship,taxOrganizationType,taxCountry,taxRegistrationNumber,supplierType,addressName,addressCountry,addressLine1,city,state,postalCode,addressPurposes,siteName,siteAddress,receiptRouting,contactFirstName,contactLastName,contactEmail,administrativeContact
+AUTO_TEST_SUPPLIER_20260918041619,Spend Authorized,Corporation,India,29ABCDE1234F1Z5,Services,Head Office,India,"Plot 100, Test Industrial Area",Bengaluru,Karnataka,560001,Ordering|Remit to,Head Office,Head Office,Direct,Automation,User,automation@example.com,Yes

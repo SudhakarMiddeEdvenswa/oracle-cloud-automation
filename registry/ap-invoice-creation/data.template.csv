@@ -1,0 +1,2 @@
+invoiceNumber,businessUnit,supplier,supplierSite,invoiceDate,invoiceAmount,currency,invoiceType,paymentTerms,orderNumber,lineDescription,lineAmount,distributionCombination,description
+AUTO,US1 Business Unit,AUTO_TEST_SUPPLIER,Head Office,AUTO,1000,USD,Standard,Immediate,,Automation test line,1000,,Automated platform test

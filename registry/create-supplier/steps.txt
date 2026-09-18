@@ -1,0 +1,86 @@
+# Create Supplier — detailed steps
+#
+# Each [step-id] block is one step. The platform runs the deterministic
+# implementation in flow.js when the id matches, and hands the prose below to
+# the AI agent whenever there is no implementation or the implementation breaks.
+#
+#   scope=session  run once per execution (login, navigation)
+#   optional       a failure is a warning, not a failed row
+#
+# {{placeholders}} are replaced with the current CSV row's values.
+
+[login scope=session] Log in to the application
+Open the application URL and sign in with the supplied user name and password.
+Handle either a single-page sign-in form or a two-step form that asks for the
+user name first and the password on the next screen.
+Expected: The application home page is displayed.
+
+[open-suppliers scope=session] Open the Suppliers work area
+Open the Navigator menu, go to Procurement, and open Suppliers. The Procurement
+group may be collapsed behind an "Expand Procurement" control, and its links can
+sit underneath a sticky header.
+Expected: The Suppliers work area is displayed.
+
+[create-supplier] Create the supplier
+From the Suppliers work area open the Tasks panel if it is closed, then choose
+Create Supplier. Enter:
+  Supplier                    {{supplierName}}
+  Business Relationship       {{businessRelationship}}
+  Tax Organization Type       {{taxOrganizationType}}
+  Tax Country                 {{taxCountry}}
+  Tax Registration Number     {{taxRegistrationNumber}}
+Tax Registration Number stays disabled until a Tax Country is chosen, so set the
+country first. Then click Create.
+Expected: The supplier profile page opens, titled "Edit Supplier: {{supplierName}}".
+
+[capture-supplier-number] Capture the generated supplier number
+Read the Supplier Number shown on the supplier profile page and store it with the
+capture name supplierNumber.
+Expected: A non-empty numeric supplier number is captured.
+
+[organization-details] Set the organization details
+On the Profile tab set Supplier Type to {{supplierType}} and save.
+Expected: Supplier Type shows {{supplierType}} with no validation error.
+
+[create-address] Add the supplier address
+Open the Addresses tab and create an address:
+  Address Name     {{addressName}}
+  Country          {{addressCountry}}
+  Address Line 1   {{addressLine1}}
+  City             {{city}}
+  State            {{state}}
+  Postal Code      {{postalCode}}
+Tick the address purposes {{addressPurposes}}, then save and close.
+Note that this application labels City as "City or Town" and, for India, Postal
+Code as "Pin Code"; the Purchasing purpose is labelled "Ordering".
+Expected: The address {{addressName}} is listed on the Addresses tab.
+
+[create-site] Add the supplier site
+Open the Sites tab and create a site:
+  Procurement BU   {{procurementBusinessUnit}} (accept the default if this is blank)
+  Address Name     {{addressName}}
+  Site             {{siteName}}
+Tick the site purposes {{sitePurposes}}. On the Receiving sub-tab set Receipt
+Routing to {{receiptRouting}}, and on the Site Assignments sub-tab use
+Autocreate Assignments if it is offered. Then save and close.
+Expected: The site {{siteName}} is listed on the Sites tab.
+
+[create-contact] Add the supplier contact
+Open the Contacts tab and create a contact:
+  First Name   {{contactFirstName}}
+  Last Name    {{contactLastName}}
+  Email        {{contactEmail}}
+Tick the administrative contact option if {{administrativeContact}} is true, and
+associate the contact with the address {{addressName}} if the form offers it.
+Then save and close.
+Expected: The contact is listed on the Contacts tab.
+
+[save-supplier] Save the supplier
+Save and close the supplier record.
+Expected: The supplier is saved with no validation errors.
+
+[reopen-supplier] Find and reopen the supplier
+Go to Manage Suppliers, search for {{supplierName}} by keyword, and open the
+supplier from the results. Navigate back through Navigator to Procurement and
+Suppliers first if the Suppliers work area is no longer on screen.
+Expected: The supplier {{supplierName}} opens from the search results.

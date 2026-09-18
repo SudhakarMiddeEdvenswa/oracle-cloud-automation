@@ -6,9 +6,12 @@ import { expect } from '@playwright/test';
  * Steps 2–4 — Oracle Cloud home page, Navigator, Procurement, Suppliers.
  */
 export class HomePage extends BasePage {
-  /** @param {import('@playwright/test').Page} page */
-  constructor(page) {
-    super(page);
+  /**
+   * @param {import('@playwright/test').Page} page
+   * @param {object} [config] - per-run instance details (see BasePage)
+   */
+  constructor(page, config = null) {
+    super(page, config);
     // On the Fusion global header, Navigator renders as a link (role=link).
     this.navigatorIcon = page
       .getByRole('link', { name: /^Navigator$/i })
@@ -19,7 +22,10 @@ export class HomePage extends BasePage {
   /** Verify the home page has loaded (Expected for step 1). */
   async verifyLoaded() {
     logger.step(1, 'Verify Oracle Cloud home page is displayed');
-    await expect(this.navigatorIcon.first()).toBeVisible({ timeout: 90000 });
+    // Fusion's first post-login render is the slowest wait in the whole flow,
+    // so it gets the run's configured timeout (90s when nothing is configured).
+    const timeout = Number(this.config?.defaultTimeout) || 90000;
+    await expect(this.navigatorIcon.first()).toBeVisible({ timeout });
     logger.pass('Oracle Cloud home page displayed');
   }
 

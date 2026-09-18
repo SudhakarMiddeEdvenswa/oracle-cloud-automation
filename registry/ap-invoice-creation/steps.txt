@@ -1,0 +1,49 @@
+# AP Invoice Creation — detailed steps
+#
+# This flow has no flow.js, so every step below is executed by the AI agent
+# straight from this prose. The navigation described here follows standard
+# Oracle Fusion Cloud paths — adjust the wording to match your own pod's
+# menus, labels and approval process, and the agent follows the change on the
+# next run. Once a step settles, its learned action sequence is cached in
+# healed-steps.json and replayed without a model call.
+#
+# {{placeholders}} are replaced with the current CSV row's values.
+
+[login scope=session] Log in to the application
+Open the application URL and sign in with the supplied user name and password.
+Expected: The application home page is displayed.
+
+[open-payables-invoices scope=session] Open the Payables Invoices work area
+Open the Navigator menu, go to Payables, and open Invoices.
+Expected: The Invoices work area is displayed.
+
+[create-invoice] Start a new invoice
+From the Tasks panel choose Create Invoice.
+Expected: The Create Invoice page is displayed.
+
+[enter-header] Enter the invoice header
+Set on the invoice header:
+  Business Unit    {{businessUnit}}
+  Supplier         {{supplier}}
+  Supplier Site    {{supplierSite}}
+  Number           {{invoiceNumber}}
+  Invoice Date     {{invoiceDate}}
+  Amount           {{invoiceAmount}}
+  Currency         {{currency}}
+  Type             {{invoiceType}}
+  Payment Terms    {{paymentTerms}}     (accept the default if blank)
+  Description      {{description}}
+Expected: The header values are accepted with no validation error.
+
+[enter-lines] Enter the invoice lines
+If {{orderNumber}} has a value, match the invoice to purchase order {{orderNumber}}: use Match Invoice Lines, search for that order, select its line, and apply the match.
+Otherwise add a line by hand with Description {{lineDescription}}, Amount {{lineAmount}} and Distribution Combination {{distributionCombination}}.
+Expected: The invoice lines total the invoice amount.
+
+[calculate-tax optional] Calculate tax
+Use the Calculate Tax action if the page offers it.
+Expected: Tax is calculated without error.
+
+[validate-invoice] Validate the invoice
+Save the invoice, then run the Validate action. Read the resulting status and store it as invoiceStatus. Read the invoice identifier shown on the page and store it as invoiceId.
+Expected: The invoice is validated and its status is shown.

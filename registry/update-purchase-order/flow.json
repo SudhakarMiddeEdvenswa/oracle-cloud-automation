@@ -1,0 +1,67 @@
+{
+  "id": "update-purchase-order",
+  "name": "Update Purchase Order",
+  "module": "Procurement",
+  "order": 40,
+  "description": "Opens an existing purchase order, applies a quantity, price or date change as a change order, and submits it.",
+  "rowLabelField": "orderNumber",
+  "captures": [
+    {
+      "name": "changeOrderNumber",
+      "description": "The change order number, if the pod raises one."
+    },
+    {
+      "name": "orderStatus",
+      "description": "The order status after the change is submitted."
+    }
+  ],
+  "fields": [
+    {
+      "name": "orderNumber",
+      "label": "Order Number",
+      "required": true,
+      "example": "1000123"
+    },
+    {
+      "name": "lineNumber",
+      "label": "Line Number",
+      "required": false,
+      "type": "number",
+      "default": "1",
+      "example": "1"
+    },
+    {
+      "name": "newQuantity",
+      "label": "New Quantity",
+      "required": false,
+      "type": "number",
+      "example": "15"
+    },
+    {
+      "name": "newPrice",
+      "label": "New Price",
+      "required": false,
+      "type": "number",
+      "example": "95"
+    },
+    {
+      "name": "newNeedByDate",
+      "label": "New Need-by Date",
+      "required": false,
+      "example": ""
+    },
+    {
+      "name": "newDescription",
+      "label": "New Description",
+      "required": false,
+      "example": ""
+    },
+    {
+      "name": "changeReason",
+      "label": "Change Reason",
+      "required": true,
+      "default": "Automated platform test",
+      "example": "Quantity revision"
+    }
+  ]
+}

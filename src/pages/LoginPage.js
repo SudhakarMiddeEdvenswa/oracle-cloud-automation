@@ -6,9 +6,12 @@ import { logger } from '../utils/logger.js';
  * Step 1 — Login to Oracle Cloud SaaS.
  */
 export class LoginPage extends BasePage {
-  /** @param {import('@playwright/test').Page} page */
-  constructor(page) {
-    super(page);
+  /**
+   * @param {import('@playwright/test').Page} page
+   * @param {object} [config] - per-run instance details (see BasePage)
+   */
+  constructor(page, config = null) {
+    super(page, config);
     // Oracle Cloud presents different login pages (OCI IAM / IDCS vs classic
     // Fusion SSO). Locate by visible label/role first, then fall back to
     // legacy id/name selectors so the framework works across pods.
@@ -25,8 +28,9 @@ export class LoginPage extends BasePage {
 
   /** Open the Oracle Cloud application URL. */
   async open() {
+    const baseUrl = this.config?.baseUrl || env.baseUrl;
     logger.step(1, 'Open Oracle Cloud SaaS URL');
-    await this.page.goto(env.baseUrl, { waitUntil: 'domcontentloaded' });
+    await this.page.goto(baseUrl, { waitUntil: 'domcontentloaded' });
     await this.waitUntilReady();
   }
 
@@ -35,7 +39,7 @@ export class LoginPage extends BasePage {
    * @param {string} [username]
    * @param {string} [password]
    */
-  async login(username = env.username, password = env.password) {
+  async login(username = this.config?.username || env.username, password = this.config?.password || env.password) {
     logger.step(1, `Login as "${username}"`);
     await this.usernameInput.first().waitFor({ state: 'visible' });
     await this.usernameInput.first().fill(username);

@@ -1,9 +1,14 @@
 {
-  "name": "oracle-cloud-supplier-automation",
-  "version": "1.0.0",
-  "description": "Playwright automation framework for creating a new Supplier in Oracle Cloud SaaS (Procurement)",
+  "name": "oracle-cloud-automation-platform",
+  "version": "0.2.0",
+  "description": "Generic AI-assisted UI automation platform: registry-driven business flows, CSV test data, a web UI, and HTML/CSV/XLSX reporting.",
   "type": "module",
   "scripts": {
+    "ui": "npm run ui:build && node platform/server/index.js",
+    "ui:server": "node platform/server/index.js",
+    "ui:build": "vite build --config platform/web/vite.config.js",
+    "ui:dev": "concurrently -n api,web -c blue,green \"node platform/server/index.js\" \"vite --config platform/web/vite.config.js\"",
+    "run": "node platform/cli.js",
     "test": "playwright test",
     "test:supplier": "playwright test tests/createSupplier.spec.js",
     "test:headed": "playwright test --headed",
@@ -15,14 +20,28 @@
     "playwright",
     "oracle-cloud",
     "oracle-fusion",
-    "supplier",
+    "test-automation",
+    "ai-agent",
+    "data-driven",
     "procurement",
-    "automation"
+    "payables"
   ],
   "author": "",
   "license": "MIT",
   "devDependencies": {
     "@playwright/test": "^1.48.0",
-    "dotenv": "^16.4.5"
+    "@vitejs/plugin-react": "^6.1.1",
+    "concurrently": "^10.0.5",
+    "dotenv": "^16.4.5",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "vite": "^8.3.0"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.127.0",
+    "exceljs": "^4.4.0",
+    "express": "^5.2.1",
+    "multer": "^2.4.0",
+    "papaparse": "^5.7.0"
   }
 }

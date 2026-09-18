@@ -1,0 +1,36 @@
+# Create Supplier — verification rules
+#
+# These run after the flow's steps, against the reopened supplier record. One
+# rule per line; {{placeholders}} resolve against the row data plus everything
+# the run captured.
+#
+#   open-tab:            switch to a tab before the rules that follow
+#   text-visible:        the text appears on the page
+#   text-not-visible:    the text does not appear
+#   field-equals:        <label> = <value>       exact, case-insensitive
+#   field-contains:      <label> = <value>       substring, case-insensitive
+#   captured-not-empty:  <capture name>
+#   captured-matches:    <capture name> = <regex>
+#   ai:                  a claim judged by the AI agent (needs ANTHROPIC_API_KEY)
+
+captured-not-empty: supplierNumber
+captured-matches:   supplierNumber = ^\d{4,}$
+
+text-visible:       {{supplierName}}
+text-visible:       Supplier Number {{supplierNumber}}
+
+open-tab:           Profile
+field-contains:     Supplier = {{supplierName}}
+field-contains:     Supplier Type = {{supplierType}}
+
+open-tab:           Addresses
+text-visible:       {{addressName}}
+
+open-tab:           Sites
+text-visible:       {{siteName}}
+
+open-tab:           Contacts
+text-visible:       {{contactLastName}}
+text-visible:       {{contactEmail}}
+
+ai:                 The supplier header shows supplier name {{supplierName}} and supplier number {{supplierNumber}}, and no error or warning banner is present anywhere on the page.

@@ -13,9 +13,12 @@ import { expect } from '@playwright/test';
  * Invoicing, Payments, Site Assignments, Qualifications).
  */
 export class SitePage extends BasePage {
-  /** @param {import('@playwright/test').Page} page */
-  constructor(page) {
-    super(page);
+  /**
+   * @param {import('@playwright/test').Page} page
+   * @param {object} [config] - per-run instance details (see BasePage)
+   */
+  constructor(page, config = null) {
+    super(page, config);
   }
 
   /** Step 12 — On the Sites tab, click Create to open the Create Site page. */
@@ -44,7 +47,7 @@ export class SitePage extends BasePage {
     logger.step(13, 'Create supplier site');
 
     // Procurement BU (required) — override the default only if one is configured.
-    const bu = env.procurementBusinessUnit;
+    const bu = site.procurementBusinessUnit || this.config?.procurementBusinessUnit || env.procurementBusinessUnit;
     if (bu) {
       await this.oracle
         .selectFromLov('Procurement BU', bu)

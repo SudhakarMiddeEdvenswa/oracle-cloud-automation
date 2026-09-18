@@ -1,0 +1,46 @@
+# GRN Creation — detailed steps
+#
+# This flow has no flow.js, so every step below is executed by the AI agent
+# straight from this prose. The navigation described here follows standard
+# Oracle Fusion Cloud paths — adjust the wording to match your own pod's
+# menus, labels and approval process, and the agent follows the change on the
+# next run. Once a step settles, its learned action sequence is cached in
+# healed-steps.json and replayed without a model call.
+#
+# {{placeholders}} are replaced with the current CSV row's values.
+
+[login scope=session] Log in to the application
+Open the application URL and sign in with the supplied user name and password.
+Expected: The application home page is displayed.
+
+[open-receiving scope=session] Open the Receiving work area
+Open the Navigator menu, go to Inventory Management (or Supply Chain Execution), and open Receiving.
+Expected: The Receiving work area is displayed.
+
+[find-expected-shipment] Find the expected shipment
+Set the receiving organization to {{organization}} if the work area asks for one. Choose the Receive Expected Shipments task and search for purchase order {{orderNumber}}.
+Expected: The expected shipment lines for order {{orderNumber}} are listed.
+
+[select-lines] Select the lines to receive
+Select line {{lineNumber}} of order {{orderNumber}} and continue to the receipt entry page.
+Expected: The selected line is carried into the receipt.
+
+[enter-receipt-header] Enter the receipt header
+Set on the receipt header:
+  Receipt Date    {{receiptDate}}
+  Packing Slip    {{packingSlip}}
+  Waybill         {{waybill}}
+  Comments        {{comments}}
+Expected: The header values are accepted.
+
+[enter-receipt-lines] Enter the receipt quantities
+Set the received quantity for line {{lineNumber}} to {{quantityReceived}}. If the line asks for a destination, set Subinventory to {{subinventory}} and Locator to {{locator}}.
+Expected: The quantity is accepted and does not exceed the ordered quantity.
+
+[submit-receipt] Submit the receipt
+Submit the receipt. Confirm any dialog that appears.
+Expected: A confirmation names the created receipt.
+
+[capture-receipt-number] Capture the receipt number
+Read the receipt number from the confirmation and store it as receiptNumber.
+Expected: A non-empty receipt number is captured.

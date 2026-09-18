@@ -1,0 +1,93 @@
+{
+  "id": "grn-creation",
+  "name": "GRN Creation",
+  "module": "Inventory / Receiving",
+  "order": 60,
+  "description": "Creates a goods receipt (GRN) against an expected shipment for a purchase order, from the Receiving work area.",
+  "rowLabelField": "orderNumber",
+  "captures": [
+    {
+      "name": "receiptNumber",
+      "description": "The receipt (GRN) number generated on submit."
+    }
+  ],
+  "fields": [
+    {
+      "name": "orderNumber",
+      "label": "Order Number",
+      "required": true,
+      "example": "1000123"
+    },
+    {
+      "name": "organization",
+      "label": "Receiving Organization",
+      "required": true,
+      "example": "Seattle Manufacturing"
+    },
+    {
+      "name": "businessUnit",
+      "label": "Business Unit",
+      "required": false,
+      "example": "US1 Business Unit"
+    },
+    {
+      "name": "supplier",
+      "label": "Supplier",
+      "required": false,
+      "example": "AUTO_TEST_SUPPLIER"
+    },
+    {
+      "name": "receiptDate",
+      "label": "Receipt Date",
+      "required": true,
+      "generated": "today",
+      "autofill": "token",
+      "example": "AUTO"
+    },
+    {
+      "name": "packingSlip",
+      "label": "Packing Slip",
+      "required": false,
+      "generated": "timestamp",
+      "autofill": "token",
+      "example": "AUTO"
+    },
+    {
+      "name": "waybill",
+      "label": "Waybill / Airbill",
+      "required": false
+    },
+    {
+      "name": "lineNumber",
+      "label": "Order Line Number",
+      "required": false,
+      "type": "number",
+      "default": "1",
+      "example": "1"
+    },
+    {
+      "name": "quantityReceived",
+      "label": "Quantity Received",
+      "required": true,
+      "type": "number",
+      "example": "10"
+    },
+    {
+      "name": "subinventory",
+      "label": "Subinventory",
+      "required": false,
+      "example": "Stores"
+    },
+    {
+      "name": "locator",
+      "label": "Locator",
+      "required": false
+    },
+    {
+      "name": "comments",
+      "label": "Comments",
+      "required": false,
+      "default": "Automated platform test"
+    }
+  ]
+}

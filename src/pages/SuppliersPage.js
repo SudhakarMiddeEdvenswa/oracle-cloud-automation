@@ -47,10 +47,10 @@ export class SuppliersPage extends BasePage {
    * @param {string} supplierName - fallback search value
    */
   async searchAndOpen(supplierNumber, supplierName) {
-    logger.step(20, `Search supplier ${supplierNumber || supplierName}`);
+    logger.step(20, `Search supplier ${supplierName} (#${supplierNumber})`);
 
-    // Open the Tasks panel and use the "Manage Suppliers" search task.
-    const manage = this.page.getByRole('link', { name: /Manage Suppliers/i }).first();
+    // Open the Tasks panel (if needed) and go to the "Manage Suppliers" search.
+    const manage = this.page.getByRole('link', { name: 'Manage Suppliers', exact: true }).first();
     if (!(await manage.isVisible().catch(() => false))) {
       const tasksToggle = this.page.getByRole('link', { name: /^Tasks$/i }).first();
       if (await tasksToggle.isVisible().catch(() => false)) {
@@ -58,29 +58,25 @@ export class SuppliersPage extends BasePage {
         await this.waitUntilReady();
       }
     }
-    if (await manage.isVisible().catch(() => false)) {
-      await manage.click();
-      await this.waitUntilReady();
-    }
+    await manage.click();
+    await this.page.waitForLoadState('networkidle').catch(() => {});
+    await this.page
+      .getByRole('heading', { name: /^Manage Suppliers$/i })
+      .first()
+      .waitFor({ state: 'visible', timeout: 30000 });
 
-    const term = supplierNumber || supplierName;
-    let searchBox = this.page.getByLabel('Supplier', { exact: false }).first();
+    // Search by Keywords (the generated supplier name is unique per run).
+    const keywords = this.page.getByRole('textbox', { name: 'Keywords', exact: true }).first();
+    await keywords.fill(supplierName);
+    await this.page.getByRole('button', { name: 'Search', exact: true }).first().click();
+    await this.waitUntilReady();
 
-    if (supplierNumber) {
-      const numberBox = this.page.getByLabel('Supplier Number', { exact: false }).first();
-      if (await numberBox.isVisible().catch(() => false)) {
-        searchBox = numberBox;
-      }
-    }
-
-    await searchBox.waitFor({ state: 'visible' });
-    await searchBox.fill(term);
-    await this.oracle.clickButton('Search');
-
+    // Open the supplier from the results.
     const resultLink = this.page.getByRole('link', { name: supplierName }).first();
     await expect(resultLink).toBeVisible({ timeout: 60000 });
     await resultLink.click();
-    await this.waitUntilReady();
+    await this.page.waitForLoadState('networkidle').catch(() => {});
+    await this.oracle.dismissConfirmation();
     logger.pass(`Supplier "${supplierName}" opened from search results`);
   }
 }

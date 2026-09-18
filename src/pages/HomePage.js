@@ -32,12 +32,26 @@ export class HomePage extends BasePage {
     logger.pass('Navigator menu displayed');
   }
 
-  /** Step 3 — Select Procurement from the Navigator. */
+  /** Step 3 — Select/expand Procurement in the Navigator. */
   async goToProcurement() {
     logger.step(3, 'Navigate to Procurement');
-    // The Procurement group header can sit under the Navigator's sticky
-    // header, which intercepts a normal click — force past it.
-    await this.oracle.clickLink('Procurement', { force: true });
+    // The Procurement group may render collapsed (with an "Expand Procurement"
+    // control) or as a clickable header. Expand it if collapsed, otherwise
+    // force-click the header (it can sit under the sticky menu header).
+    const expand = this.page.getByRole('link', { name: /Expand Procurement/i }).first();
+    if (await expand.isVisible().catch(() => false)) {
+      await expand.scrollIntoViewIfNeeded().catch(() => {});
+      await expand.click({ force: true });
+      await this.waitUntilReady();
+    } else {
+      await this.oracle.clickLink('Procurement', { force: true });
+    }
+    // Ensure the Suppliers entry is now revealed.
+    await this.page
+      .getByRole('link', { name: /^Suppliers$/i })
+      .first()
+      .waitFor({ state: 'visible' })
+      .catch(() => {});
     logger.pass('Procurement options displayed');
   }
 

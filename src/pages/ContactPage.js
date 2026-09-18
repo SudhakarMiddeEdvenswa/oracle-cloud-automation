@@ -14,12 +14,21 @@ export class ContactPage extends BasePage {
   /** Step 17 — Open Contacts tab and start a new contact. */
   async startCreateContact() {
     logger.step(17, 'Navigate to Contacts and click Create');
-    const createBtn = this.page
-      .getByRole('button', { name: /^(Create|Add|Actions)$/i })
-      .first();
-    await createBtn.waitFor({ state: 'visible' });
-    await createBtn.click();
-    await this.waitUntilReady();
+    // Clear any leftover save confirmation, then make sure the Contacts grid is
+    // loaded before clicking Create (avoids racing the tab swap).
+    await this.oracle.dismissConfirmation();
+    await this.page
+      .getByRole('columnheader', { name: 'Name', exact: true })
+      .first()
+      .waitFor({ state: 'visible' });
+
+    await this.page.getByRole('button', { name: 'Create', exact: true }).first().click();
+    // The Create Contact page renders asynchronously; wait for its heading.
+    await this.page.waitForLoadState('networkidle').catch(() => {});
+    await this.page
+      .getByRole('heading', { name: /^Create Contact$/i })
+      .first()
+      .waitFor({ state: 'visible', timeout: 30000 });
     logger.pass('Create Contact form displayed');
   }
 
@@ -41,21 +50,33 @@ export class ContactPage extends BasePage {
     }
 
     if (addressName) {
-      await this.oracle
-        .setCheckbox(addressName, true)
-        .catch(() => logger.warn(`Could not associate contact with "${addressName}"`));
+      // Optional association; only attempt if a matching checkbox is present.
+      const addrBox = this.page.getByRole('checkbox', { name: addressName, exact: false }).first();
+      if (await addrBox.isVisible({ timeout: 3000 }).catch(() => false)) {
+        await this.oracle
+          .setCheckbox(addressName, true)
+          .catch(() => logger.warn(`Could not associate contact with "${addressName}"`));
+      } else {
+        logger.warn(`Address "${addressName}" association not available on contact form`);
+      }
     }
 
     await this.oracle.clickButton('Save and Close');
+    await this.oracle.dismissConfirmation();
     logger.pass('Contact saved');
   }
 
   /**
-   * Verify a contact appears in the Contacts list.
-   * @param {string} fullName
+   * Verify a contact appears in the Contacts list. The grid renders the name as
+   * "Last, First", so match on both name parts (order-independent) and email.
+   * @param {{firstName:string, lastName:string, email:string}} contact
    */
-  async expectContactListed(fullName) {
-    await expect(this.page.getByText(fullName, { exact: false }).first()).toBeVisible();
-    logger.pass(`Contact "${fullName}" listed`);
+  async expectContactListed(contact) {
+    const nameCell = this.page
+      .getByText(new RegExp(`${contact.lastName}.*${contact.firstName}|${contact.firstName}.*${contact.lastName}`, 'i'))
+      .first();
+    await expect(nameCell).toBeVisible();
+    await expect(this.page.getByText(contact.email, { exact: false }).first()).toBeVisible();
+    logger.pass(`Contact "${contact.lastName}, ${contact.firstName}" listed`);
   }
 }

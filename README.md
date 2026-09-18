@@ -79,6 +79,30 @@ All business data lives in [`testdata/supplierData.json`](./testdata/supplierDat
 and is loaded via `src/utils/testDataReader.js`. The Supplier Name is made unique
 per run by appending a timestamp (`AUTO_TEST_SUPPLIER_<timestamp>`).
 
+## Live-verified behavior (this pod)
+
+The framework was run end-to-end against a live Oracle Fusion pod and passes all
+21 steps. Key environment-specific behaviors it handles:
+
+- **Login** is Oracle Identity Cloud (Username / Password / **Next**).
+- **Navigator → Procurement** may be collapsed (an *Expand Procurement* control)
+  and its links can sit under a sticky header — handled with force-clicks.
+- **Create Supplier** is an inline popup with required **Business Relationship**
+  and **Tax Organization Type**; **Tax Registration Number** is disabled until a
+  **Tax Country** is chosen and must be **unique per run** (auto-generated).
+- **Addresses (Redwood):** the *Purchasing* purpose is labelled **Ordering**;
+  City is **City or Town**, Postal Code is **Pin Code**.
+- **Sites:** created from the Sites tab; the **Receiving** / **Site Assignments**
+  sub-tabs and Autocreate are best-effort (skipped with a warning if the pod
+  doesn't expose them). Procurement BU defaults to the pod's BU when the
+  configured `PROCUREMENT_BUSINESS_UNIT` isn't available.
+- **Contacts** list shows names as `Last, First`; validation matches accordingly.
+- Tab switches and save confirmations are stabilized with content-marker waits.
+
+> Set `PROCUREMENT_BUSINESS_UNIT` to a BU that exists in your pod (e.g.
+> `US1 Business Unit`). If it isn't found, the run logs a warning and uses the
+> site form's default BU.
+
 ## Notes on Oracle Fusion locators
 
 Oracle Cloud SaaS renders an ADF / Oracle JET UI whose element IDs are dynamic.

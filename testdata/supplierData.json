@@ -14,10 +14,8 @@
     "city": "Bengaluru",
     "state": "Karnataka",
     "postalCode": "560001",
-    "purposes": {
-      "purchasing": true,
-      "remitTo": true
-    }
+    "_purposeNote": "In the Redwood address UI the Purchasing purpose is labelled 'Ordering'.",
+    "purposes": ["Ordering", "Remit to"]
   },
   "site": {
     "siteName": "Head Office",

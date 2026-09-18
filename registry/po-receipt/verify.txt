@@ -1,0 +1,12 @@
+# PO Receipt — verification rules
+#
+# One rule per line, run after the flow's steps. {{placeholders}} resolve
+# against the row data plus everything the run captured.
+#
+#   open-tab: / text-visible: / text-not-visible:
+#   field-equals: <label> = <value>      field-contains: <label> = <value>
+#   captured-not-empty: <name>           captured-matches: <name> = <regex>
+#   ai: <claim judged by the AI agent>
+
+captured-not-empty: receivedQuantity
+ai:                 Purchase order {{orderNumber}} line {{lineNumber}} shows a received quantity matching the receipt {{receiptNumber}} (expected {{expectedQuantity}} when that column was filled in), and nothing on the page indicates an unprocessed receiving transaction or an error.

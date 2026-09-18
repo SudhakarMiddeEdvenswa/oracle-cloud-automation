@@ -19,6 +19,15 @@ downloads/
 logs/
 *.log
 
+# Platform output
+# Run folders hold reports, screenshots and the resolved test data of each run.
+runs/
+platform/web/dist/
+
+# Learned locator sequences are machine-written per environment. Commit these
+# deliberately if you want a pod's healed steps shared with the team.
+registry/*/healed-steps.json
+
 # OS / editor
 .DS_Store
 Thumbs.db

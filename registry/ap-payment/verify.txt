@@ -1,0 +1,13 @@
+# AP Payment — verification rules
+#
+# One rule per line, run after the flow's steps. {{placeholders}} resolve
+# against the row data plus everything the run captured.
+#
+#   open-tab: / text-visible: / text-not-visible:
+#   field-equals: <label> = <value>      field-contains: <label> = <value>
+#   captured-not-empty: <name>           captured-matches: <name> = <regex>
+#   ai: <claim judged by the AI agent>
+
+captured-not-empty: paymentNumber
+captured-not-empty: paymentStatus
+ai:                 Payment {{paymentNumber}} exists for supplier {{supplier}}, pays invoice {{invoiceNumber}}, its amount is {{paymentAmount}} {{currency}}, and its status indicates the payment was created successfully. No error banner is present.

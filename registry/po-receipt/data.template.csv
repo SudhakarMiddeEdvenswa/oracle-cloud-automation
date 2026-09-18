@@ -1,0 +1,2 @@
+receiptNumber,orderNumber,organization,lineNumber,expectedQuantity,putAwayQuantity,subinventory,locator,inspectionResult
+RCV1000789,1000123,Seattle Manufacturing,1,10,10,Stores,,

@@ -9,8 +9,8 @@ import { AddressPage } from '../src/pages/AddressPage.js';
 import { SitePage } from '../src/pages/SitePage.js';
 import { ContactPage } from '../src/pages/ContactPage.js';
 
-import { getSupplierTestData } from '../src/utils/testDataReader.js';
-import { uniqueSupplierName } from '../src/utils/dataGenerator.js';
+import { getSupplierTestDataRows } from '../src/utils/testDataReader.js';
+import { uniqueSupplierName, uniqueTaxRegistrationNumber } from '../src/utils/dataGenerator.js';
 import { env } from '../src/utils/env.js';
 import { logger } from '../src/utils/logger.js';
 
@@ -19,16 +19,22 @@ import { logger } from '../src/utils/logger.js';
  * Implements the 21-step flow described in
  * Create_New_Supplier_AI_Automation_prompt.md.
  */
-test.describe('Oracle Cloud — Create New Supplier (E2E)', () => {
-  test('creates a supplier and validates it end-to-end', async ({ page }) => {
-    const data = getSupplierTestData();
+// One test case per row of testdata/supplierData.csv.
+const supplierRows = getSupplierTestDataRows();
 
-    // Runtime variables captured during the run.
-    const supplierName = uniqueSupplierName(data.supplier.namePrefix);
+test.describe('Oracle Cloud — Create New Supplier (E2E)', () => {
+  supplierRows.forEach((data, rowIndex) => {
+  test(`creates a supplier and validates it end-to-end [row ${rowIndex + 1}]`, async ({ page }) => {
+    // Runtime variables captured/generated during the run (unique per execution).
+    // Append a timestamp (and row index) to the CSV supplier name so re-runs and
+    // multiple rows never collide, e.g. "AUTO_TEST_SUPPLIER_20260918023615".
+    const supplierName = uniqueSupplierName(data.supplier.namePrefix) +
+      (supplierRows.length > 1 ? `_R${rowIndex + 1}` : '');
+    const taxRegistrationNumber = uniqueTaxRegistrationNumber('29', rowIndex);
     let SUPPLIER_NUMBER = '';
-    const contactFullName = `${data.contact.firstName} ${data.contact.lastName}`;
 
     logger.info(`Generated supplier name: ${supplierName}`);
+    logger.info(`Generated tax registration number: ${taxRegistrationNumber}`);
 
     // --- Page objects ---------------------------------------------------
     const loginPage = new LoginPage(page);
@@ -59,7 +65,7 @@ test.describe('Oracle Cloud — Create New Supplier (E2E)', () => {
       businessRelationship: data.supplier.businessRelationship,
       taxOrganizationType: data.supplier.taxOrganizationType,
       taxCountry: data.supplier.taxCountry,
-      taxRegistrationNumber: data.supplier.taxRegistrationNumber,
+      taxRegistrationNumber,
     });
 
     // --- Step 7: Capture Supplier Number --------------------------------
@@ -89,22 +95,32 @@ test.describe('Oracle Cloud — Create New Supplier (E2E)', () => {
     await profilePage.openTab('Contacts');
     await contactPage.startCreateContact();
     await contactPage.createContact(data.contact, data.address.addressName);
-    await contactPage.expectContactListed(contactFullName);
+    await contactPage.expectContactListed(data.contact);
 
     // --- Step 19: Save the complete supplier ----------------------------
     await profilePage.saveAll();
 
     // --- Step 20: Search and reopen supplier ----------------------------
-    await homePage.openNavigator();
-    await homePage.goToProcurement();
-    await homePage.goToSuppliers();
+    // After "Save and Close" we are back on the Suppliers work area, so search
+    // directly. Fall back to Navigator only if that work area isn't present.
+    const onSuppliersWorkArea = await page
+      .getByRole('link', { name: /^Tasks$/i })
+      .first()
+      .isVisible()
+      .catch(() => false);
+    if (!onSuppliersWorkArea) {
+      await homePage.openNavigator();
+      await homePage.goToProcurement();
+      await homePage.goToSuppliers();
+    }
     await suppliersPage.searchAndOpen(SUPPLIER_NUMBER, supplierName);
 
     // --- Step 21: Final end-to-end validation ---------------------------
     logger.step(21, 'Perform final end-to-end validation');
+    await profilePage.validateSupplierName(supplierName);
     await profilePage.openTab('Profile');
+    await profilePage.validateSupplierNumber(SUPPLIER_NUMBER);
     await profilePage.validateField('Supplier', supplierName);
-    await profilePage.validateField('Supplier Number', SUPPLIER_NUMBER);
     await profilePage.validateField('Supplier Type', data.supplier.supplierType);
 
     await profilePage.openTab('Addresses');
@@ -114,8 +130,9 @@ test.describe('Oracle Cloud — Create New Supplier (E2E)', () => {
     await sitePage.expectSiteListed(data.site.siteName);
 
     await profilePage.openTab('Contacts');
-    await contactPage.expectContactListed(contactFullName);
+    await contactPage.expectContactListed(data.contact);
 
     logger.pass(`TEST PASS — Supplier "${supplierName}" (#${SUPPLIER_NUMBER}) validated`);
+  });
   });
 });

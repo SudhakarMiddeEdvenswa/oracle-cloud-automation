@@ -1,0 +1,43 @@
+# Update PO Requisition — detailed steps
+#
+# This flow has no flow.js, so every step below is executed by the AI agent
+# straight from this prose. The navigation described here follows standard
+# Oracle Fusion Cloud paths — adjust the wording to match your own pod's
+# menus, labels and approval process, and the agent follows the change on the
+# next run. Once a step settles, its learned action sequence is cached in
+# healed-steps.json and replayed without a model call.
+#
+# {{placeholders}} are replaced with the current CSV row's values.
+
+[login scope=session] Log in to the application
+Open the application URL and sign in with the supplied user name and password.
+Expected: The application home page is displayed.
+
+[open-requisitions scope=session] Open the Purchase Requisitions work area
+Open the Navigator menu, go to Procurement, and open Purchase Requisitions.
+Expected: The Purchase Requisitions work area is displayed.
+
+[search-requisition] Find the requisition
+Use Manage Requisitions (or the work area search) to find requisition {{requisitionNumber}}.
+Expected: Requisition {{requisitionNumber}} appears in the results.
+
+[open-requisition] Open the requisition
+Open requisition {{requisitionNumber}} from the results.
+Expected: The requisition details are displayed.
+
+[edit-requisition] Put the requisition into edit
+Use Actions then Edit to open the requisition for change. If the application warns that this withdraws the requisition from approval, accept it.
+Expected: The requisition is editable.
+
+[apply-changes] Apply the requested changes
+Apply only the changes that have a value in this row and leave everything else untouched:
+  Line {{lineNumber}} Quantity              {{newQuantity}}
+  Line {{lineNumber}} Price                 {{newPrice}}
+  Line {{lineNumber}} Need-by Date          {{newNeedByDate}}
+  Line {{lineNumber}} Deliver-to Location   {{newDeliverToLocation}}
+Enter {{changeReason}} where the application asks for a change reason or justification.
+Expected: The new values appear on the requisition line with no validation error.
+
+[resubmit-requisition] Resubmit the requisition
+Submit the requisition again. Confirm any dialog, then read the resulting status and store it as requisitionStatus.
+Expected: The requisition is resubmitted and its status reflects it.

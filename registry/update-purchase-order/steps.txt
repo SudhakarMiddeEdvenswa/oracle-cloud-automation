@@ -1,0 +1,43 @@
+# Update Purchase Order — detailed steps
+#
+# This flow has no flow.js, so every step below is executed by the AI agent
+# straight from this prose. The navigation described here follows standard
+# Oracle Fusion Cloud paths — adjust the wording to match your own pod's
+# menus, labels and approval process, and the agent follows the change on the
+# next run. Once a step settles, its learned action sequence is cached in
+# healed-steps.json and replayed without a model call.
+#
+# {{placeholders}} are replaced with the current CSV row's values.
+
+[login scope=session] Log in to the application
+Open the application URL and sign in with the supplied user name and password.
+Expected: The application home page is displayed.
+
+[open-purchase-orders scope=session] Open the Purchase Orders work area
+Open the Navigator menu, go to Procurement, and open Purchase Orders.
+Expected: The Purchase Orders work area is displayed.
+
+[search-order] Find the purchase order
+Search for order {{orderNumber}} using the work area search or the Manage Orders task.
+Expected: Order {{orderNumber}} appears in the results.
+
+[open-order] Open the purchase order
+Open order {{orderNumber}} from the results.
+Expected: The order details page for {{orderNumber}} is displayed.
+
+[edit-order] Put the order into edit
+Use Actions then Edit to open the order for change. If the application warns that editing creates a change order, accept it.
+Expected: The order is editable, as a change order if the pod requires one.
+
+[apply-changes] Apply the requested changes
+Apply only the changes that have a value in this row and leave everything else untouched:
+  Line {{lineNumber}} Quantity      {{newQuantity}}
+  Line {{lineNumber}} Price         {{newPrice}}
+  Line {{lineNumber}} Need-by Date  {{newNeedByDate}}
+  Order Description               {{newDescription}}
+Enter {{changeReason}} as the change reason or description where the application asks for one.
+Expected: The new values appear on the order with no validation error.
+
+[submit-change] Submit the change
+Submit the change order (or save and submit the order). Confirm any dialog. Read the change order number if one is shown and store it as changeOrderNumber, then read the order status and store it as orderStatus.
+Expected: The change is submitted and the status reflects it.

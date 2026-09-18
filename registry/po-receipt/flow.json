@@ -1,0 +1,77 @@
+{
+  "id": "po-receipt",
+  "name": "PO Receipt",
+  "module": "Inventory / Receiving",
+  "order": 70,
+  "description": "Reviews a receipt against its purchase order and completes the put-away or inspection the receipt routing requires.",
+  "rowLabelField": "receiptNumber",
+  "captures": [
+    {
+      "name": "receivedQuantity",
+      "description": "The quantity the purchase order reports as received."
+    },
+    {
+      "name": "putAwayStatus",
+      "description": "The outcome of the put-away or inspection transaction."
+    }
+  ],
+  "fields": [
+    {
+      "name": "receiptNumber",
+      "label": "Receipt Number",
+      "required": true,
+      "example": "RCV1000789"
+    },
+    {
+      "name": "orderNumber",
+      "label": "Order Number",
+      "required": true,
+      "example": "1000123"
+    },
+    {
+      "name": "organization",
+      "label": "Receiving Organization",
+      "required": true,
+      "example": "Seattle Manufacturing"
+    },
+    {
+      "name": "lineNumber",
+      "label": "Receipt Line Number",
+      "required": false,
+      "type": "number",
+      "default": "1",
+      "example": "1"
+    },
+    {
+      "name": "expectedQuantity",
+      "label": "Expected Received Quantity",
+      "required": false,
+      "type": "number",
+      "example": "10"
+    },
+    {
+      "name": "putAwayQuantity",
+      "label": "Put Away Quantity",
+      "required": false,
+      "type": "number",
+      "example": "10"
+    },
+    {
+      "name": "subinventory",
+      "label": "Subinventory",
+      "required": false,
+      "example": "Stores"
+    },
+    {
+      "name": "locator",
+      "label": "Locator",
+      "required": false
+    },
+    {
+      "name": "inspectionResult",
+      "label": "Inspection Result",
+      "required": false,
+      "note": "Accept or Reject, when the routing includes inspection."
+    }
+  ]
+}

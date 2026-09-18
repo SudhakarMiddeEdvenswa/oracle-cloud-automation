@@ -1,0 +1,2 @@
+requisitionDescription,businessUnit,requester,itemDescription,category,quantity,uom,price,currency,needByDate,deliverToLocation,supplier,supplierSite,justification
+AUTO_TEST_REQ,US1 Business Unit,,Automation test item,Miscellaneous,10,Each,100,USD,AUTO,Seattle,,,Automated platform test

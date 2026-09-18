@@ -1,0 +1,63 @@
+{
+  "id": "update-requisition",
+  "name": "Update PO Requisition",
+  "module": "Procurement",
+  "order": 50,
+  "description": "Opens an existing purchase requisition, changes line details, and resubmits it for approval.",
+  "rowLabelField": "requisitionNumber",
+  "captures": [
+    {
+      "name": "requisitionStatus",
+      "description": "The requisition status after resubmission."
+    }
+  ],
+  "fields": [
+    {
+      "name": "requisitionNumber",
+      "label": "Requisition Number",
+      "required": true,
+      "example": "REQ1000456"
+    },
+    {
+      "name": "lineNumber",
+      "label": "Line Number",
+      "required": false,
+      "type": "number",
+      "default": "1",
+      "example": "1"
+    },
+    {
+      "name": "newQuantity",
+      "label": "New Quantity",
+      "required": false,
+      "type": "number",
+      "example": "20"
+    },
+    {
+      "name": "newPrice",
+      "label": "New Price",
+      "required": false,
+      "type": "number",
+      "example": ""
+    },
+    {
+      "name": "newNeedByDate",
+      "label": "New Need-by Date",
+      "required": false,
+      "example": ""
+    },
+    {
+      "name": "newDeliverToLocation",
+      "label": "New Deliver-to Location",
+      "required": false,
+      "example": ""
+    },
+    {
+      "name": "changeReason",
+      "label": "Change Reason",
+      "required": true,
+      "default": "Automated platform test",
+      "example": "Quantity revision"
+    }
+  ]
+}

@@ -1,0 +1,113 @@
+{
+  "id": "ap-invoice-creation",
+  "name": "AP Invoice Creation",
+  "module": "Payables",
+  "order": 80,
+  "description": "Creates a payables invoice, optionally matched to a purchase order, and validates it.",
+  "rowLabelField": "invoiceNumber",
+  "captures": [
+    {
+      "name": "invoiceId",
+      "description": "The invoice identifier the application assigns."
+    },
+    {
+      "name": "invoiceStatus",
+      "description": "The invoice status after validation."
+    }
+  ],
+  "fields": [
+    {
+      "name": "invoiceNumber",
+      "label": "Invoice Number",
+      "required": true,
+      "generated": "timestamp",
+      "autofill": "token",
+      "generatorPrefix": "INV",
+      "example": "AUTO"
+    },
+    {
+      "name": "businessUnit",
+      "label": "Business Unit",
+      "required": true,
+      "example": "US1 Business Unit"
+    },
+    {
+      "name": "supplier",
+      "label": "Supplier",
+      "required": true,
+      "example": "AUTO_TEST_SUPPLIER"
+    },
+    {
+      "name": "supplierSite",
+      "label": "Supplier Site",
+      "required": true,
+      "example": "Head Office"
+    },
+    {
+      "name": "invoiceDate",
+      "label": "Invoice Date",
+      "required": true,
+      "generated": "today",
+      "autofill": "token",
+      "example": "AUTO"
+    },
+    {
+      "name": "invoiceAmount",
+      "label": "Invoice Amount",
+      "required": true,
+      "type": "number",
+      "example": "1000"
+    },
+    {
+      "name": "currency",
+      "label": "Currency",
+      "required": false,
+      "default": "USD",
+      "example": "USD"
+    },
+    {
+      "name": "invoiceType",
+      "label": "Invoice Type",
+      "required": false,
+      "default": "Standard",
+      "example": "Standard"
+    },
+    {
+      "name": "paymentTerms",
+      "label": "Payment Terms",
+      "required": false,
+      "example": "Immediate"
+    },
+    {
+      "name": "orderNumber",
+      "label": "PO Number",
+      "required": false,
+      "note": "Fill this in to match the invoice to a purchase order instead of entering lines by hand."
+    },
+    {
+      "name": "lineDescription",
+      "label": "Line Description",
+      "required": false,
+      "example": "Automation test line"
+    },
+    {
+      "name": "lineAmount",
+      "label": "Line Amount",
+      "required": false,
+      "type": "number",
+      "example": "1000"
+    },
+    {
+      "name": "distributionCombination",
+      "label": "Distribution Combination",
+      "required": false,
+      "note": "Required when the invoice is not matched to a purchase order."
+    },
+    {
+      "name": "description",
+      "label": "Invoice Description",
+      "required": false,
+      "default": "Automated platform test"
+    }
+  ]
+}

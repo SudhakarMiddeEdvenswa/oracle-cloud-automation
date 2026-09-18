@@ -1,0 +1,60 @@
+# Create Purchase Order — detailed steps
+#
+# This flow has no flow.js, so every step below is executed by the AI agent
+# straight from this prose. The navigation described here follows standard
+# Oracle Fusion Cloud paths — adjust the wording to match your own pod's
+# menus, labels and approval process, and the agent follows the change on the
+# next run. Once a step settles, its learned action sequence is cached in
+# healed-steps.json and replayed without a model call.
+#
+# {{placeholders}} are replaced with the current CSV row's values.
+
+[login scope=session] Log in to the application
+Open the application URL and sign in with the supplied user name and password.
+Expected: The application home page is displayed.
+
+[open-purchase-orders scope=session] Open the Purchase Orders work area
+Open the Navigator menu, go to Procurement, and open Purchase Orders.
+Expected: The Purchase Orders work area is displayed.
+
+[create-order] Start a new purchase order
+From the Tasks panel choose Create Order (or Create Purchase Order). If a dialog asks for the Procurement BU and Supplier, enter Procurement BU {{businessUnit}}, Supplier {{supplier}} and Supplier Site {{supplierSite}}, then continue.
+Expected: The purchase order entry page is displayed.
+
+[enter-header] Enter the order header
+On the order header set:
+  Description        {{description}}
+  Supplier           {{supplier}}
+  Supplier Site      {{supplierSite}}
+  Buyer              {{buyer}}        (accept the default if blank)
+  Currency           {{currency}}
+  Bill-to Location   {{billToLocation}}   (accept the default if blank)
+  Ship-to Location   {{shipToLocation}}
+  Payment Terms      {{paymentTerms}}     (accept the default if blank)
+Expected: The header values are accepted with no validation error.
+
+[add-line] Add the order line
+Add a line and enter:
+  Line Type          {{lineType}}
+  Item Description   {{itemDescription}}
+  Category Name      {{category}}
+  Quantity           {{quantity}}
+  UOM                {{uom}}
+  Price              {{price}}
+Expected: The line is accepted and the order amount reflects quantity times price.
+
+[enter-schedule] Set the schedule details
+Open the line's schedules or distributions and set Need-by Date to {{needByDate}} and Ship-to Location to {{shipToLocation}} if they are not already inherited from the header.
+Expected: The schedule shows the need-by date and ship-to location.
+
+[save-order] Save the order
+Save the purchase order.
+Expected: The order is saved and a purchase order number is shown.
+
+[capture-order-number] Capture the purchase order number
+Read the purchase order number from the page header and store it as orderNumber.
+Expected: A non-empty order number is captured.
+
+[submit-order] Submit the order for approval
+Submit the order. Confirm any dialog that appears, then read the resulting status and store it as orderStatus.
+Expected: The order is submitted and its status reflects the submission.

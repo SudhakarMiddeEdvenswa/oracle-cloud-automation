@@ -1,0 +1,107 @@
+{
+  "id": "create-requisition",
+  "name": "Create Pur Requisition",
+  "module": "Procurement",
+  "order": 20,
+  "description": "Raises a purchase requisition for a noncatalog item and submits it for approval.",
+  "rowLabelField": "requisitionDescription",
+  "captures": [
+    {
+      "name": "requisitionNumber",
+      "description": "The requisition number generated on submit."
+    },
+    {
+      "name": "requisitionStatus",
+      "description": "The requisition status after submit."
+    }
+  ],
+  "fields": [
+    {
+      "name": "requisitionDescription",
+      "label": "Requisition Description",
+      "required": true,
+      "example": "AUTO_TEST_REQ"
+    },
+    {
+      "name": "businessUnit",
+      "label": "Requisitioning BU",
+      "required": true,
+      "example": "US1 Business Unit"
+    },
+    {
+      "name": "requester",
+      "label": "Requester",
+      "required": false,
+      "note": "Leave blank to requisition for yourself."
+    },
+    {
+      "name": "itemDescription",
+      "label": "Item Description",
+      "required": true,
+      "example": "Automation test item"
+    },
+    {
+      "name": "category",
+      "label": "Category Name",
+      "required": true,
+      "example": "Miscellaneous"
+    },
+    {
+      "name": "quantity",
+      "label": "Quantity",
+      "required": true,
+      "type": "number",
+      "example": "10"
+    },
+    {
+      "name": "uom",
+      "label": "UOM",
+      "required": true,
+      "example": "Each"
+    },
+    {
+      "name": "price",
+      "label": "Price",
+      "required": true,
+      "type": "number",
+      "example": "100"
+    },
+    {
+      "name": "currency",
+      "label": "Currency",
+      "required": false,
+      "default": "USD",
+      "example": "USD"
+    },
+    {
+      "name": "needByDate",
+      "label": "Need-by Date",
+      "required": true,
+      "generated": "today+7",
+      "autofill": "token",
+      "example": "AUTO"
+    },
+    {
+      "name": "deliverToLocation",
+      "label": "Deliver-to Location",
+      "required": true,
+      "example": "Seattle"
+    },
+    {
+      "name": "supplier",
+      "label": "Supplier",
+      "required": false
+    },
+    {
+      "name": "supplierSite",
+      "label": "Supplier Site",
+      "required": false
+    },
+    {
+      "name": "justification",
+      "label": "Justification",
+      "required": false,
+      "default": "Automated platform test"
+    }
+  ]
+}

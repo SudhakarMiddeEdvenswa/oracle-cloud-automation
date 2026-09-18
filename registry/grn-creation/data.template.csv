@@ -1,0 +1,2 @@
+orderNumber,organization,businessUnit,supplier,receiptDate,packingSlip,waybill,lineNumber,quantityReceived,subinventory,locator,comments
+1000123,Seattle Manufacturing,US1 Business Unit,AUTO_TEST_SUPPLIER,AUTO,AUTO,,1,10,Stores,,Automated platform test

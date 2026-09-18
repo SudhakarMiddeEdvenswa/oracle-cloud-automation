@@ -1,0 +1,54 @@
+# Create Pur Requisition — detailed steps
+#
+# This flow has no flow.js, so every step below is executed by the AI agent
+# straight from this prose. The navigation described here follows standard
+# Oracle Fusion Cloud paths — adjust the wording to match your own pod's
+# menus, labels and approval process, and the agent follows the change on the
+# next run. Once a step settles, its learned action sequence is cached in
+# healed-steps.json and replayed without a model call.
+#
+# {{placeholders}} are replaced with the current CSV row's values.
+
+[login scope=session] Log in to the application
+Open the application URL and sign in with the supplied user name and password.
+Expected: The application home page is displayed.
+
+[open-requisitions scope=session] Open the Purchase Requisitions work area
+Open the Navigator menu, go to Procurement, and open Purchase Requisitions.
+Expected: The Purchase Requisitions (Self Service Procurement) work area is displayed.
+
+[start-requisition] Start a noncatalog request
+Set the Requisitioning BU to {{businessUnit}} if the work area offers that choice.
+Under More Tasks (or the equivalent task list) choose Request Noncatalog Item.
+Expected: The noncatalog request form is displayed.
+
+[enter-line] Enter the requisition line
+Fill in the request line:
+  Item Description      {{itemDescription}}
+  Category Name         {{category}}
+  Quantity              {{quantity}}
+  UOM                   {{uom}}
+  Price                 {{price}}
+  Currency              {{currency}}
+If a supplier is given, set Supplier to {{supplier}} and Supplier Site to {{supplierSite}}.
+Expected: The line details are accepted with no validation error.
+
+[add-to-cart] Add the line to the requisition
+Add the line to the cart or requisition.
+Expected: The line is added and the cart shows one line.
+
+[review-requisition] Review the requisition
+Open the cart and edit or review the requisition. Set:
+  Description            {{requisitionDescription}}
+  Justification          {{justification}}
+  Requested Delivery Date / Need-by Date   {{needByDate}}
+  Deliver-to Location    {{deliverToLocation}}
+Expected: The requisition header shows the entered values.
+
+[submit-requisition] Submit the requisition
+Submit the requisition for approval. Confirm any dialog that appears.
+Expected: A confirmation names the submitted requisition.
+
+[capture-requisition-number] Capture the requisition number and status
+Read the requisition number from the confirmation or the requisition header and store it as requisitionNumber. Read the requisition status and store it as requisitionStatus.
+Expected: A non-empty requisition number is captured.

@@ -1,0 +1,48 @@
+# AP Payment — detailed steps
+#
+# This flow has no flow.js, so every step below is executed by the AI agent
+# straight from this prose. The navigation described here follows standard
+# Oracle Fusion Cloud paths — adjust the wording to match your own pod's
+# menus, labels and approval process, and the agent follows the change on the
+# next run. Once a step settles, its learned action sequence is cached in
+# healed-steps.json and replayed without a model call.
+#
+# {{placeholders}} are replaced with the current CSV row's values.
+
+[login scope=session] Log in to the application
+Open the application URL and sign in with the supplied user name and password.
+Expected: The application home page is displayed.
+
+[open-payables-payments scope=session] Open the Payables Payments work area
+Open the Navigator menu, go to Payables, and open Payments.
+Expected: The Payments work area is displayed.
+
+[create-payment] Start a new payment
+From the Tasks panel choose Create Payment.
+Expected: The Create Payment page is displayed.
+
+[enter-header] Enter the payment header
+Set on the payment header:
+  Business Unit             {{businessUnit}}
+  Payment Date             {{paymentDate}}
+  Supplier                 {{supplier}}
+  Supplier Site            {{supplierSite}}
+  Payment Method           {{paymentMethod}}
+  Bank Account             {{bankAccount}}
+  Payment Process Profile  {{paymentProcessProfile}}   (accept the default if blank)
+  Payment Document         {{paymentDocument}}         (accept the default if blank)
+  Currency                 {{currency}}
+  Description              {{description}}
+Expected: The header values are accepted with no validation error.
+
+[select-invoices] Select the invoice to pay
+Use Select and Add (or the equivalent) to find invoice {{invoiceNumber}} for supplier {{supplier}} and add it to the payment.
+Expected: Invoice {{invoiceNumber}} is listed on the payment.
+
+[apply-amount] Apply the payment amount
+Set the payment amount for invoice {{invoiceNumber}} to {{paymentAmount}} and confirm the payment total matches.
+Expected: The payment total equals {{paymentAmount}}.
+
+[save-payment] Save the payment
+Save the payment. Confirm any dialog, then read the payment or document number and store it as paymentNumber, and read the status and store it as paymentStatus.
+Expected: The payment is saved and a payment number is shown.

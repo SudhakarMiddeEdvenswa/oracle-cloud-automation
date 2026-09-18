@@ -1,0 +1,94 @@
+{
+  "id": "ap-payment",
+  "name": "AP Payment",
+  "module": "Payables",
+  "order": 90,
+  "description": "Creates a payment against one or more validated payables invoices.",
+  "rowLabelField": "invoiceNumber",
+  "captures": [
+    {
+      "name": "paymentNumber",
+      "description": "The payment number or document number generated on save."
+    },
+    {
+      "name": "paymentStatus",
+      "description": "The payment status after save."
+    }
+  ],
+  "fields": [
+    {
+      "name": "invoiceNumber",
+      "label": "Invoice Number",
+      "required": true,
+      "example": "INV20260918120000"
+    },
+    {
+      "name": "businessUnit",
+      "label": "Business Unit",
+      "required": true,
+      "example": "US1 Business Unit"
+    },
+    {
+      "name": "supplier",
+      "label": "Supplier",
+      "required": true,
+      "example": "AUTO_TEST_SUPPLIER"
+    },
+    {
+      "name": "supplierSite",
+      "label": "Supplier Site",
+      "required": true,
+      "example": "Head Office"
+    },
+    {
+      "name": "paymentDate",
+      "label": "Payment Date",
+      "required": true,
+      "generated": "today",
+      "autofill": "token",
+      "example": "AUTO"
+    },
+    {
+      "name": "paymentAmount",
+      "label": "Payment Amount",
+      "required": true,
+      "type": "number",
+      "example": "1000"
+    },
+    {
+      "name": "currency",
+      "label": "Currency",
+      "required": false,
+      "default": "USD",
+      "example": "USD"
+    },
+    {
+      "name": "paymentMethod",
+      "label": "Payment Method",
+      "required": true,
+      "example": "Check"
+    },
+    {
+      "name": "bankAccount",
+      "label": "Bank Account",
+      "required": true,
+      "example": "BofA-1234"
+    },
+    {
+      "name": "paymentProcessProfile",
+      "label": "Payment Process Profile",
+      "required": false
+    },
+    {
+      "name": "paymentDocument",
+      "label": "Payment Document",
+      "required": false
+    },
+    {
+      "name": "description",
+      "label": "Payment Description",
+      "required": false,
+      "default": "Automated platform test"
+    }
+  ]
+}

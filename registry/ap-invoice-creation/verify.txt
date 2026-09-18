@@ -1,0 +1,13 @@
+# AP Invoice Creation — verification rules
+#
+# One rule per line, run after the flow's steps. {{placeholders}} resolve
+# against the row data plus everything the run captured.
+#
+#   open-tab: / text-visible: / text-not-visible:
+#   field-equals: <label> = <value>      field-contains: <label> = <value>
+#   captured-not-empty: <name>           captured-matches: <name> = <regex>
+#   ai: <claim judged by the AI agent>
+
+captured-not-empty: invoiceStatus
+text-visible:       {{invoiceNumber}}
+ai:                 Invoice {{invoiceNumber}} exists for supplier {{supplier}} with amount {{invoiceAmount}} {{currency}}, its lines total the header amount, and its status is Validated (or another status that indicates validation succeeded rather than a hold or a needs-revalidation state). No error banner is present.

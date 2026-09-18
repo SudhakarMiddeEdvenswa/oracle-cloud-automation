@@ -32,20 +32,23 @@ export class AddressPage extends BasePage {
     await this.oracle.fillByLabel('Address Name', address.addressName);
     await this.oracle.selectFromLov('Country', address.country);
     await this.oracle.fillByLabel('Address Line 1', address.addressLine1);
-    await this.oracle.fillByLabel('City', address.city);
-    await this.oracle.selectFromLov('State', address.state);
-    await this.oracle.fillByLabel('Postal Code', address.postalCode);
+    // City is an autocomplete combobox ("City or Town"); State is a plain
+    // textbox; Postal Code is labelled "Pin Code" for India.
+    await this.oracle.selectFromLov('City or Town', address.city);
+    await this.oracle.fillByLabel('State', address.state);
+    await this.oracle.fillByLabel('Pin Code', address.postalCode);
     logger.pass('Address information entered without validation errors');
   }
 
   /**
    * Step 11 — Configure address purposes and save.
-   * @param {{purchasing:boolean, remitTo:boolean}} purposes
+   * @param {string[]} purposes - checkbox labels to enable (e.g. Ordering, Remit to)
    */
   async setPurposesAndSave(purposes) {
     logger.step(11, 'Configure address purpose');
-    await this.oracle.setCheckbox('Purchasing', purposes.purchasing);
-    await this.oracle.setCheckbox('Remit to', purposes.remitTo);
+    for (const purpose of purposes) {
+      await this.oracle.setCheckbox(purpose, true);
+    }
 
     await this.oracle.clickButton('Save and Close');
     logger.pass('Address saved');

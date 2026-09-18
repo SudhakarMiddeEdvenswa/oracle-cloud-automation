@@ -1,0 +1,2 @@
+requisitionNumber,lineNumber,newQuantity,newPrice,newNeedByDate,newDeliverToLocation,changeReason
+REQ1000456,1,20,,,,Quantity revision

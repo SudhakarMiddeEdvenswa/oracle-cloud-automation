@@ -45,22 +45,30 @@ export class CreateSupplierPage extends BasePage {
     await this.oracle.fillByLabel('Tax Registration Number', data.taxRegistrationNumber);
 
     logger.step(6, 'Click Create');
-    const nameFieldStillOpen = this.page.getByRole('textbox', { name: 'Supplier', exact: true });
     await this.oracle.clickButton('Create', { exact: true });
 
-    // Confirm the popup actually closed; otherwise surface any validation error.
+    // Confirm the "Edit Supplier: <name>" profile page opened (Create succeeded);
+    // otherwise surface any validation error from the popup.
     try {
-      await nameFieldStillOpen.waitFor({ state: 'hidden', timeout: 30000 });
+      await this.editSupplierHeading()
+        .waitFor({ state: 'visible', timeout: 30000 });
     } catch {
-      const errorText = await this.page
-        .getByText(/error|required|must|invalid/i)
-        .first()
-        .textContent()
-        .catch(() => '');
-      throw new Error(`Create Supplier did not complete. Popup still open. ${errorText || ''}`.trim());
+      const messages = await this.page
+        .getByText(/already exists|required|must|invalid|enter a|cannot|can't|ZX-\d+/i)
+        .allTextContents()
+        .catch(() => []);
+      const detail = messages.map((m) => m.trim()).filter(Boolean).join(' | ');
+      throw new Error(
+        `Create Supplier did not complete (popup still open). Validation: ${detail || 'unknown'}`
+      );
     }
     await this.waitUntilReady();
     logger.pass('Supplier created; Supplier Profile page opened');
+  }
+
+  /** Locator for the "Edit Supplier: <name>" profile page heading. */
+  editSupplierHeading() {
+    return this.page.getByRole('heading', { name: /^Edit Supplier:/i }).first();
   }
 
   /**
@@ -69,27 +77,16 @@ export class CreateSupplierPage extends BasePage {
    */
   async captureSupplierNumber() {
     logger.step(7, 'Capture Supplier Number');
-    // Oracle renders the supplier number as a read-only output beside its label.
-    const numberField = this.page
-      .getByLabel('Supplier Number', { exact: false })
-      .first();
 
-    let supplierNumber = '';
-    if (await numberField.isVisible().catch(() => false)) {
-      supplierNumber =
-        (await numberField.inputValue().catch(() => '')) ||
-        (await numberField.textContent().catch(() => '')) ||
-        '';
-    }
+    // The Supplier Number is a read-only output rendered inline with its label,
+    // e.g. "Supplier Number 2026000285 Alternate Name". Match the run and
+    // extract the digits that follow the label.
+    const numberRun = this.page.getByText(/Supplier Number\s*\d+/i).first();
+    await numberRun.waitFor({ state: 'visible', timeout: 30000 });
+    const raw = (await numberRun.textContent().catch(() => '')) || '';
+    const match = raw.match(/Supplier Number\s*(\d+)/i);
+    const supplierNumber = (match ? match[1] : '').trim();
 
-    // Fallback: read the output text node following the "Supplier Number" label.
-    if (!supplierNumber) {
-      supplierNumber = await this.oracle
-        .readText('xpath=//label[contains(.,"Supplier Number")]/following::*[normalize-space()][1]')
-        .catch(() => '');
-    }
-
-    supplierNumber = supplierNumber.trim();
     expect(supplierNumber, 'Supplier Number should be present').not.toEqual('');
     logger.pass(`SUPPLIER_NUMBER captured: ${supplierNumber}`);
     return supplierNumber;

@@ -1,0 +1,2 @@
+invoiceNumber,businessUnit,supplier,supplierSite,paymentDate,paymentAmount,currency,paymentMethod,bankAccount,paymentProcessProfile,paymentDocument,description
+INV20260918120000,US1 Business Unit,AUTO_TEST_SUPPLIER,Head Office,AUTO,1000,USD,Check,BofA-1234,,,Automated platform test

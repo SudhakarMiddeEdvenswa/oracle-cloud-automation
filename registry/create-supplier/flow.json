@@ -1,0 +1,129 @@
+{
+  "id": "create-supplier",
+  "name": "Create Supplier",
+  "module": "Procurement",
+  "order": 10,
+  "description": "Creates a supplier with an address, a site and a contact, then reopens it and validates the record end to end.",
+  "rowLabelField": "supplierName",
+  "captures": [
+    { "name": "supplierNumber", "description": "The supplier number the application generates on Create." }
+  ],
+  "fields": [
+    {
+      "name": "supplierName",
+      "label": "Supplier Name",
+      "required": true,
+      "generated": "unique-name",
+      "autofill": "blank",
+      "generatorPrefix": "AUTO_TEST_SUPPLIER",
+      "example": "AUTO_TEST_SUPPLIER",
+      "note": "Leave blank to get a unique AUTO_TEST_SUPPLIER_<timestamp> name, or enter an exact name to test duplicate handling."
+    },
+    {
+      "name": "businessRelationship",
+      "label": "Business Relationship",
+      "required": true,
+      "default": "Spend Authorized",
+      "example": "Spend Authorized"
+    },
+    {
+      "name": "taxOrganizationType",
+      "label": "Tax Organization Type",
+      "required": true,
+      "default": "Corporation",
+      "example": "Corporation"
+    },
+    {
+      "name": "taxCountry",
+      "label": "Tax Country",
+      "required": true,
+      "default": "India",
+      "example": "India"
+    },
+    {
+      "name": "taxRegistrationNumber",
+      "label": "Tax Registration Number",
+      "aliases": ["Tax Id", "Tax ID", "GSTIN"],
+      "required": true,
+      "generated": "unique-gstin",
+      "autofill": "token",
+      "example": "AUTO",
+      "note": "Enter AUTO for a fresh unique number, a literal number to test a specific value, or leave blank to check that the flow reports a missing tax id."
+    },
+    {
+      "name": "supplierType",
+      "label": "Supplier Type",
+      "required": true,
+      "default": "Services",
+      "example": "Services"
+    },
+    {
+      "name": "addressName",
+      "label": "Address Name",
+      "required": true,
+      "default": "Head Office",
+      "example": "Head Office"
+    },
+    {
+      "name": "addressCountry",
+      "label": "Address Country",
+      "required": true,
+      "default": "India",
+      "example": "India"
+    },
+    {
+      "name": "addressLine1",
+      "label": "Address Line 1",
+      "required": true,
+      "example": "Plot 100, Test Industrial Area"
+    },
+    { "name": "city", "label": "City", "required": true, "example": "Bengaluru" },
+    { "name": "state", "label": "State", "required": false, "example": "Karnataka" },
+    {
+      "name": "postalCode",
+      "label": "Postal Code",
+      "aliases": ["Pin Code", "Zip"],
+      "required": false,
+      "example": "560001"
+    },
+    {
+      "name": "addressPurposes",
+      "label": "Address Purposes",
+      "type": "list",
+      "listSeparator": "|",
+      "required": false,
+      "default": "Ordering|Remit to",
+      "example": "Ordering|Remit to",
+      "note": "Pipe-separated. In the Redwood address UI the Purchasing purpose is labelled Ordering."
+    },
+    { "name": "siteName", "label": "Site Name", "required": true, "default": "Head Office", "example": "Head Office" },
+    {
+      "name": "procurementBusinessUnit",
+      "label": "Procurement BU",
+      "required": false,
+      "example": "",
+      "note": "Leave blank to accept the pod default business unit."
+    },
+    {
+      "name": "sitePurposes",
+      "label": "Site Purposes",
+      "type": "list",
+      "listSeparator": "|",
+      "required": false,
+      "default": "Purchasing",
+      "example": "Purchasing"
+    },
+    { "name": "receiptRouting", "label": "Receipt Routing", "required": false, "default": "Direct", "example": "Direct" },
+    { "name": "contactFirstName", "label": "Contact First Name", "required": true, "example": "Automation" },
+    { "name": "contactLastName", "label": "Contact Last Name", "required": true, "example": "User" },
+    { "name": "contactEmail", "label": "Contact Email", "required": true, "example": "automation@example.com" },
+    {
+      "name": "administrativeContact",
+      "label": "Administrative Contact",
+      "type": "boolean",
+      "required": false,
+      "default": "Yes",
+      "example": "Yes"
+    }
+  ]
+}

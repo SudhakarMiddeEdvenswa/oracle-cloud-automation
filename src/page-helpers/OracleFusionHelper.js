@@ -91,6 +91,14 @@ export class OracleFusionHelper {
 
     // Case 1: native <select> — select directly by visible label.
     if (tagName === 'select') {
+      // Fail fast (instead of a 60s wait) if the option isn't present.
+      const options = await control.evaluate((el) =>
+        Array.from(el.options).map((o) => o.label || o.text)
+      );
+      const found = options.some((o) => (o || '').trim() === value.trim());
+      if (!found) {
+        throw new Error(`Option "${value}" not available (choices: ${options.join(', ')})`);
+      }
       await control.selectOption({ label: value });
       await this.waitForLoading();
       return;
@@ -119,14 +127,50 @@ export class OracleFusionHelper {
    * @param {string} label
    * @param {boolean} checked
    */
-  async setCheckbox(label, checked) {
+  async setCheckbox(label, checked, opts = {}) {
+    const { root = this.page } = opts;
     logger.info(`Set checkbox "${label}" -> ${checked}`);
-    const box = this.page.getByLabel(label, { exact: false }).first();
-    await box.waitFor({ state: 'visible' });
-    if (checked) {
-      await box.check();
+    const box = root
+      .getByRole('checkbox', { name: label, exact: false })
+      .or(root.getByLabel(label, { exact: false }))
+      .first();
+    await box.waitFor({ state: 'attached' });
+
+    // Already in the desired state? Nothing to do.
+    if ((await box.isChecked().catch(() => false)) === checked) return;
+
+    // Oracle renders the real <input> hidden/0-sized; the adjacent text label
+    // is the actual click target. Prefer clicking that, then fall back to a
+    // forced check on the input.
+    const clickableLabel = root.getByText(label, { exact: true }).first();
+    if (await clickableLabel.isVisible().catch(() => false)) {
+      await clickableLabel.click();
     } else {
-      await box.uncheck();
+      await box.setChecked(checked, { force: true });
+    }
+
+    // Verify the state took effect.
+    const finalState = await box.isChecked().catch(() => null);
+    if (finalState !== null && finalState !== checked) {
+      await box.setChecked(checked, { force: true }).catch(() => {});
+    }
+    await this.waitForLoading();
+  }
+
+  /**
+   * Dismiss an Oracle "Confirmation / Your changes were saved" popup if one is
+   * showing, so it doesn't intercept the next click.
+   */
+  async dismissConfirmation() {
+    const ok = this.page.getByRole('button', { name: /^(OK|Close)$/i }).first();
+    if (await ok.isVisible().catch(() => false)) {
+      await ok.click().catch(() => {});
+      await this.waitForLoading();
+      return;
+    }
+    const closeLink = this.page.getByRole('link', { name: /^Close$/i }).first();
+    if (await closeLink.isVisible().catch(() => false)) {
+      await closeLink.click().catch(() => {});
     }
   }
 

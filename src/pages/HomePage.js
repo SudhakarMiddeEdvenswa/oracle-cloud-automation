@@ -6,9 +6,12 @@ import { expect } from '@playwright/test';
  * Steps 2–4 — Oracle Cloud home page, Navigator, Procurement, Suppliers.
  */
 export class HomePage extends BasePage {
-  /** @param {import('@playwright/test').Page} page */
-  constructor(page) {
-    super(page);
+  /**
+   * @param {import('@playwright/test').Page} page
+   * @param {object} [config] - per-run instance details (see BasePage)
+   */
+  constructor(page, config = null) {
+    super(page, config);
     // On the Fusion global header, Navigator renders as a link (role=link).
     this.navigatorIcon = page
       .getByRole('link', { name: /^Navigator$/i })
@@ -19,7 +22,10 @@ export class HomePage extends BasePage {
   /** Verify the home page has loaded (Expected for step 1). */
   async verifyLoaded() {
     logger.step(1, 'Verify Oracle Cloud home page is displayed');
-    await expect(this.navigatorIcon.first()).toBeVisible({ timeout: 90000 });
+    // Fusion's first post-login render is the slowest wait in the whole flow,
+    // so it gets the run's configured timeout (90s when nothing is configured).
+    const timeout = Number(this.config?.defaultTimeout) || 90000;
+    await expect(this.navigatorIcon.first()).toBeVisible({ timeout });
     logger.pass('Oracle Cloud home page displayed');
   }
 
@@ -32,12 +38,26 @@ export class HomePage extends BasePage {
     logger.pass('Navigator menu displayed');
   }
 
-  /** Step 3 — Select Procurement from the Navigator. */
+  /** Step 3 — Select/expand Procurement in the Navigator. */
   async goToProcurement() {
     logger.step(3, 'Navigate to Procurement');
-    // The Procurement group header can sit under the Navigator's sticky
-    // header, which intercepts a normal click — force past it.
-    await this.oracle.clickLink('Procurement', { force: true });
+    // The Procurement group may render collapsed (with an "Expand Procurement"
+    // control) or as a clickable header. Expand it if collapsed, otherwise
+    // force-click the header (it can sit under the sticky menu header).
+    const expand = this.page.getByRole('link', { name: /Expand Procurement/i }).first();
+    if (await expand.isVisible().catch(() => false)) {
+      await expand.scrollIntoViewIfNeeded().catch(() => {});
+      await expand.click({ force: true });
+      await this.waitUntilReady();
+    } else {
+      await this.oracle.clickLink('Procurement', { force: true });
+    }
+    // Ensure the Suppliers entry is now revealed.
+    await this.page
+      .getByRole('link', { name: /^Suppliers$/i })
+      .first()
+      .waitFor({ state: 'visible' })
+      .catch(() => {});
     logger.pass('Procurement options displayed');
   }
 

@@ -37,12 +37,10 @@ export class CreateRequisitionPage extends BasePage {
 
     logger.step(7, 'Set item category and type');
     if (data.category) {
-      // Category is a Required Redwood combobox; fall back to the first offered
-      // value if the configured one is not available on this pod, so the run can
-      // continue (the warning logs the valid options for the data file).
-      await this.oracle
-        .selectRedwoodCombobox('Category', data.category, { allowFirstFallback: true })
-        .catch((err) => logger.warn(`Category not set: ${err.message}`));
+      // Category is a Required Redwood combobox. Select the configured value and
+      // fail if it is not available — never substitute an arbitrary category,
+      // which would submit a requisition that does not match the test data.
+      await this.oracle.selectRedwoodCombobox('Category', data.category);
     }
     // Item Type is a required combobox that Oracle defaults to
     // "Goods billed by quantity"; leave the default unless the data overrides it.
@@ -60,10 +58,9 @@ export class CreateRequisitionPage extends BasePage {
     await this.oracle.fillByLabel('Quantity', qty, { exact: false });
 
     if (data.uom) {
-      // UOM is a Required Redwood combobox (see Category note above).
-      await this.oracle
-        .selectRedwoodCombobox('UOM', data.uom, { allowFirstFallback: true })
-        .catch((err) => logger.warn(`UOM not set: ${err.message}`));
+      // UOM is a Required Redwood combobox. Select the configured value and fail
+      // if it is not available (see Category note above).
+      await this.oracle.selectRedwoodCombobox('UOM', data.uom);
     }
     if (data.price !== undefined && String(data.price).trim() !== '') {
       // The price field is labelled "Price $" (currency suffix); match loosely.

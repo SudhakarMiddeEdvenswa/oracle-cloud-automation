@@ -43,6 +43,8 @@ export default function RunForm({
   const grouped = groupByModule(flows);
   // A run needs data from exactly one source: an upload or a testdata-folder file.
   const hasData = !!dataFile || !!dataFileName;
+  // Lets us clear the native file input when the user switches to a folder file.
+  const fileInputRef = React.useRef(null);
 
   return (
     <form
@@ -93,10 +95,14 @@ export default function RunForm({
               value={dataFileName}
               onChange={(event) => {
                 setDataFileName?.(event.target.value);
-                // A folder selection and an upload are mutually exclusive.
-                if (event.target.value) setDataFile(null);
+                // A folder selection and an upload are mutually exclusive: clear
+                // the upload (state + the native input) so the user can switch
+                // between the two sources freely without reloading.
+                if (event.target.value) {
+                  setDataFile(null);
+                  if (fileInputRef.current) fileInputRef.current.value = '';
+                }
               }}
-              disabled={!!dataFile}
             >
               <option value="">Select a testdata file…</option>
               {testdataFiles.map((f) => (
@@ -115,6 +121,7 @@ export default function RunForm({
               id="dataFile"
               type="file"
               accept=".csv,text/csv"
+              ref={fileInputRef}
               onChange={(event) => {
                 const file = event.target.files?.[0] ?? null;
                 setDataFile(file);

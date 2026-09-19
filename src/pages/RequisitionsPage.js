@@ -87,16 +87,16 @@ export class RequisitionsPage extends BasePage {
     await this.waitUntilReady();
     await this.oracle.waitForProcurementIndicator();
 
-    // Confirm the requisition surfaced in the results.
-    await expect(this.page.getByText(requisitionNumber, { exact: false }).first()).toBeVisible({
-      timeout: 30000,
-    });
+    // Confirm the requisition surfaced in the results. Match the number with
+    // digit boundaries so "204505" cannot be satisfied by "2045051".
+    const numberRe = exactNumberRegex(requisitionNumber);
+    await expect(this.page.getByText(numberRe).first()).toBeVisible({ timeout: 30000 });
 
     // Open it when it is a clickable link/card; otherwise validation runs against
     // the results row, which already carries the key fields.
     const openLink = this.page
-      .getByRole('link', { name: new RegExp(requisitionNumber) })
-      .or(this.page.getByRole('button', { name: new RegExp(requisitionNumber) }))
+      .getByRole('link', { name: numberRe })
+      .or(this.page.getByRole('button', { name: numberRe }))
       .first();
     if (await openLink.isVisible().catch(() => false)) {
       await openLink.click();
@@ -116,7 +116,9 @@ export class RequisitionsPage extends BasePage {
   async validateRequisition(data) {
     logger.step(21, 'Perform final end-to-end validation');
 
-    await expect(this.page.getByText(data.requisitionNumber, { exact: false }).first()).toBeVisible();
+    // Digit-boundary match so the exact requisition number is asserted, not a
+    // longer number that merely contains it.
+    await expect(this.page.getByText(exactNumberRegex(data.requisitionNumber)).first()).toBeVisible();
     logger.pass(`Validated Requisition Number = "${data.requisitionNumber}"`);
 
     const checkVisible = async (label, value) => {
@@ -133,4 +135,15 @@ export class RequisitionsPage extends BasePage {
     await checkVisible('Item', data.itemDescription);
     await checkVisible('Deliver-to Location', data.deliverToLocation);
   }
+}
+
+/**
+ * A regex that matches a numeric identifier only when it is not part of a longer
+ * run of digits, so "204505" does not match inside "2045051".
+ * @param {string|number} n
+ * @returns {RegExp}
+ */
+function exactNumberRegex(n) {
+  const digits = String(n).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`(?<!\\d)${digits}(?!\\d)`);
 }

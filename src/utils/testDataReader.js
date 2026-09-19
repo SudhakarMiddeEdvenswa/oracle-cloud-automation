@@ -66,12 +66,11 @@ function mapSupplierRow(row) {
 }
 
 /**
- * Read supplier test cases from a CSV file in the testdata folder. Every
- * non-empty row is one test case.
- * @param {string} [fileName="supplierData.csv"]
- * @returns {object[]} array of nested supplier data objects
+ * Read and parse a CSV file from the testdata folder into indexed rows.
+ * @param {string} fileName
+ * @returns {Array<Map<string,string>>} normalized-key accessor per row
  */
-export function getSupplierTestDataRows(fileName = 'supplierData.csv') {
+function readCsvRows(fileName) {
   const filePath = path.join(TESTDATA_DIR, fileName);
   if (!fs.existsSync(filePath)) {
     throw new Error(`Test data file not found: ${filePath}`);
@@ -83,5 +82,58 @@ export function getSupplierTestDataRows(fileName = 'supplierData.csv') {
   if (!rows.length) {
     throw new Error(`No test data rows found in "${fileName}"`);
   }
-  return rows.map((raw) => mapSupplierRow(indexRow(raw)));
+  return rows.map((raw) => indexRow(raw));
+}
+
+/**
+ * Read supplier test cases from a CSV file in the testdata folder. Every
+ * non-empty row is one test case.
+ * @param {string} [fileName="supplierData.csv"]
+ * @returns {object[]} array of nested supplier data objects
+ */
+export function getSupplierTestDataRows(fileName = 'supplierData.csv') {
+  return readCsvRows(fileName).map(mapSupplierRow);
+}
+
+/**
+ * Map one indexed CSV row to the flat requisition structure the requisition
+ * page objects and the create-requisition spec consume. Column names match the
+ * create-requisition flow.json contract, so the same file drives the web UI and
+ * the standalone spec.
+ *
+ * `requisitionDescription` is exposed as `descriptionPrefix`, so the spec can
+ * append a per-run timestamp (e.g. "AUTO_TEST_REQ_20260918023615").
+ *
+ * @param {Map<string,string>} row - normalized-key accessor from indexRow()
+ * @returns {object}
+ */
+function mapRequisitionRow(row) {
+  const get = (key) => row.get(key) ?? '';
+  return {
+    descriptionPrefix: get('requisitiondescription') || 'AUTO_TEST_REQ',
+    businessUnit: get('businessunit'),
+    requester: get('requester'),
+    itemDescription: get('itemdescription'),
+    category: get('category'),
+    quantity: get('quantity') || '1',
+    uom: get('uom'),
+    price: get('price'),
+    currency: get('currency') || 'USD',
+    // "AUTO" (or blank) means: generate a valid future date at run time.
+    needByDate: get('needbydate'),
+    deliverToLocation: get('delivertolocation'),
+    supplier: get('supplier'),
+    supplierSite: get('suppliersite'),
+    justification: get('justification'),
+  };
+}
+
+/**
+ * Read purchase-requisition test cases from a CSV file in the testdata folder.
+ * Every non-empty row is one test case.
+ * @param {string} [fileName="Purchase_Requisition_Data.csv"]
+ * @returns {object[]} array of requisition data objects
+ */
+export function getRequisitionTestDataRows(fileName = 'Purchase_Requisition_Data.csv') {
+  return readCsvRows(fileName).map(mapRequisitionRow);
 }

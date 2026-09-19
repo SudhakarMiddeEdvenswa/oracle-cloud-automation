@@ -30,6 +30,19 @@ export class OracleFusionHelper {
   }
 
   /**
+   * Wait out the Redwood Procurement page-loading indicator, which overlays the
+   * header and intercepts clicks (e.g. the Cart tab) while content settles.
+   * Best-effort: resolves immediately when the indicator is not showing.
+   */
+  async waitForProcurementIndicator() {
+    const spinner = this.page.locator(
+      '.oj-fa-procurement-page-loading-indicator-container .oj-progress-circle, ' +
+        '.oj-fa-procurement-page-loading-indicator-container [role="progressbar"]'
+    );
+    await spinner.first().waitFor({ state: 'hidden', timeout: 30000 }).catch(() => {});
+  }
+
+  /**
    * Fill an input identified by its visible label text.
    * @param {string} label
    * @param {string} value
@@ -123,6 +136,84 @@ export class OracleFusionHelper {
   }
 
   /**
+   * Select a value from a Redwood (Oracle JET) single-select combobox by label.
+   *
+   * These are neither native <select> nor classic ADF LOVs: the control is an
+   * <input role="combobox"> overlaid by an <oj-label> that intercepts clicks,
+   * and its dropdown is an oj-list-view rendered as role="grid" whose choices are
+   * role="row" / role="gridcell" (NOT role="option"). So: force-click to open,
+   * type to filter the async list, then click the matching row.
+   *
+   * @param {string} label
+   * @param {string} value
+   * @param {{exact?:boolean, allowFirstFallback?:boolean, root?:import('@playwright/test').Locator}} [opts]
+   *   allowFirstFallback: when the requested value is not offered, pick the first
+   *   available row instead of failing (and log the choices seen).
+   * @returns {Promise<string>} the row text actually selected
+   */
+  async selectRedwoodCombobox(label, value, opts = {}) {
+    const { exact = false, allowFirstFallback = false, root = this.page } = opts;
+    logger.info(`Select "${value}" for combobox "${label}"`);
+
+    const combo = root.getByRole('combobox', { name: label, exact }).first();
+    await combo.waitFor({ state: 'visible' });
+    await combo.scrollIntoViewIfNeeded().catch(() => {});
+
+    // The oj-label overlays the input and intercepts pointer events, so a plain
+    // click times out — force it to open the dropdown.
+    await combo.click({ force: true });
+    await combo.fill('').catch(() => {});
+    // Real key events drive the async, filtered LOV (aria-autocomplete=list).
+    await combo.pressSequentially(String(value), { delay: 40 });
+
+    // Scope the result rows to this combobox's own dropdown (aria-controls) so we
+    // never match rows from another grid on the page.
+    const dropdownId = await combo.getAttribute('aria-controls').catch(() => null);
+    const scope = dropdownId ? this.page.locator(`#${cssEscape(dropdownId)}`) : this.page;
+
+    // Let any "Loading…" indicator resolve, then wait for rows to render.
+    await this.page
+      .getByText(/^Loading/i)
+      .first()
+      .waitFor({ state: 'hidden', timeout: 8000 })
+      .catch(() => {});
+    await scope
+      .getByRole('row')
+      .first()
+      .waitFor({ state: 'visible', timeout: 12000 })
+      .catch(() => {});
+
+    // A row whose accessible name contains the value (JET repeats code + name,
+    // e.g. "615.00 Office Supplies Office Supplies").
+    const match = scope.getByRole('row', { name: new RegExp(escapeRegExp(value), 'i') }).first();
+    if (await match.isVisible({ timeout: 5000 }).catch(() => false)) {
+      const text = (await match.textContent())?.trim() || value;
+      await match.click();
+      await this.waitForLoading();
+      return text;
+    }
+
+    const rows = scope.getByRole('row');
+    const count = await rows.count().catch(() => 0);
+    if (allowFirstFallback && count > 0) {
+      const first = rows.first();
+      const text = (await first.textContent())?.trim() || '';
+      const available = (await rows.allTextContents().catch(() => []))
+        .map((t) => t.replace(/\s+/g, ' ').trim())
+        .filter(Boolean)
+        .slice(0, 15);
+      logger.warn(`"${value}" not offered for "${label}"; choosing "${text}". Available: ${available.join(' | ')}`);
+      await first.click();
+      await this.waitForLoading();
+      return text;
+    }
+
+    // Close the open list before surfacing the error.
+    await this.page.keyboard.press('Escape').catch(() => {});
+    throw new Error(`"${value}" not available for "${label}" (${count} rows offered).`);
+  }
+
+  /**
    * Toggle a checkbox identified by its visible label to the desired state.
    * @param {string} label
    * @param {boolean} checked
@@ -205,4 +296,14 @@ export class OracleFusionHelper {
     logger.info(`Screenshot saved: ${filePath}`);
     return filePath;
   }
+}
+
+/** Escape a string for safe use inside a RegExp. */
+function escapeRegExp(text) {
+  return String(text).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/** Escape a string for use as a CSS #id selector (ids can contain "|", ".", etc.). */
+function cssEscape(id) {
+  return String(id).replace(/([^a-zA-Z0-9_-])/g, '\\$1');
 }

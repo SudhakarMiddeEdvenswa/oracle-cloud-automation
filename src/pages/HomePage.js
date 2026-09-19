@@ -72,4 +72,22 @@ export class HomePage extends BasePage {
     await this.waitUntilReady();
     logger.pass('Suppliers page displayed');
   }
+
+  /**
+   * Step 4 (requisition flow) — Open Purchase Requisitions.
+   * Under the expanded Procurement group the entry renders as "Purchase
+   * Requisitions" on most pods; some label it just "Requisitions".
+   */
+  async goToPurchaseRequisitions() {
+    logger.step(4, 'Open Purchase Requisitions');
+    const requisitions = this.page
+      .getByRole('link', { name: /^Purchase Requisitions$/i })
+      .or(this.page.getByRole('link', { name: /^Requisitions$/i }))
+      .first();
+    await requisitions.waitFor({ state: 'visible' });
+    await requisitions.scrollIntoViewIfNeeded().catch(() => {});
+    await requisitions.click({ force: true });
+    await this.waitUntilReady();
+    logger.pass('Purchase Requisitions page displayed');
+  }
 }

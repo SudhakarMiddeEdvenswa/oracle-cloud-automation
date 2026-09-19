@@ -19,6 +19,9 @@ export default function RunForm({
   setForm,
   dataFile,
   setDataFile,
+  testdataFiles = [],
+  dataFileName = '',
+  setDataFileName,
   onPreview,
   onExecute,
   busy,
@@ -38,6 +41,8 @@ export default function RunForm({
     }));
 
   const grouped = groupByModule(flows);
+  // A run needs data from exactly one source: an upload or a testdata-folder file.
+  const hasData = !!dataFile || !!dataFileName;
 
   return (
     <form
@@ -82,22 +87,58 @@ export default function RunForm({
         <h2>Data file</h2>
         <div className="content">
           <div className="field">
-            <label htmlFor="dataFile">Upload the data file (CSV)</label>
+            <label htmlFor="dataFileName">Select from the testdata folder</label>
+            <select
+              id="dataFileName"
+              value={dataFileName}
+              onChange={(event) => {
+                setDataFileName?.(event.target.value);
+                // A folder selection and an upload are mutually exclusive.
+                if (event.target.value) setDataFile(null);
+              }}
+              disabled={!!dataFile}
+            >
+              <option value="">Select a testdata file…</option>
+              {testdataFiles.map((f) => (
+                <option key={f.name} value={f.name}>
+                  {f.name}
+                </option>
+              ))}
+            </select>
+            <div className="hint">
+              CSV files in the project&apos;s <code>testdata/</code> folder. One row per test case.
+            </div>
+          </div>
+          <div className="field">
+            <label htmlFor="dataFile">…or upload a data file (CSV)</label>
             <input
               id="dataFile"
               type="file"
               accept=".csv,text/csv"
-              onChange={(event) => setDataFile(event.target.files?.[0] ?? null)}
+              onChange={(event) => {
+                const file = event.target.files?.[0] ?? null;
+                setDataFile(file);
+                // An upload wins over a folder selection; clear the latter.
+                if (file) setDataFileName?.('');
+              }}
             />
             <div className="hint">
-              One row per test case. {dataFile ? <strong>{dataFile.name}</strong> : 'No file chosen yet.'}
+              {dataFile ? (
+                <strong>{dataFile.name}</strong>
+              ) : dataFileName ? (
+                <>
+                  Using <strong>{dataFileName}</strong> from the testdata folder.
+                </>
+              ) : (
+                'No file chosen yet.'
+              )}
             </div>
           </div>
           <div className="actions">
             <button
               type="button"
               className="secondary"
-              disabled={!form.flowId || !dataFile || busy}
+              disabled={!form.flowId || !hasData || busy}
               onClick={onPreview}
             >
               Check data file
@@ -254,7 +295,7 @@ export default function RunForm({
       </section>
 
       <div className="actions">
-        <button className="primary" type="submit" disabled={busy || !form.flowId || !dataFile}>
+        <button className="primary" type="submit" disabled={busy || !form.flowId || !hasData}>
           {busy ? 'Running…' : 'Execute'}
         </button>
         {!form.reportFormats.length && <span className="pill warn">No format selected — HTML will be produced</span>}

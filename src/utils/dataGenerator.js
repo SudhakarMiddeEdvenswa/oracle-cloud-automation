@@ -17,13 +17,50 @@ export function timestamp() {
 }
 
 /**
+ * Produce a unique identifier from a prefix by appending a compact timestamp,
+ * e.g. "AUTO_TEST_REQ" -> "AUTO_TEST_REQ_20260918123045".
+ * @param {string} prefix
+ * @returns {string}
+ */
+export function uniqueName(prefix) {
+  return `${prefix}_${timestamp()}`;
+}
+
+/**
  * Produce a unique supplier name from a prefix, e.g.
  * "AUTO_TEST_SUPPLIER" -> "AUTO_TEST_SUPPLIER_20260918123045".
  * @param {string} prefix
  * @returns {string}
  */
 export function uniqueSupplierName(prefix) {
-  return `${prefix}_${timestamp()}`;
+  return uniqueName(prefix);
+}
+
+/**
+ * Produce a unique requisition description from a prefix, e.g.
+ * "AUTO_TEST_REQ" -> "AUTO_TEST_REQ_20260918123045".
+ * @param {string} prefix
+ * @returns {string}
+ */
+export function uniqueRequisitionDescription(prefix) {
+  return uniqueName(prefix);
+}
+
+/**
+ * A valid future date (default 7 days ahead) formatted for Oracle date fields.
+ * US-shaped pods accept M/D/YYYY; pass format="iso" for YYYY-MM-DD.
+ * @param {number} [daysAhead=7]
+ * @param {"us"|"iso"} [format="us"]
+ * @returns {string}
+ */
+export function futureDate(daysAhead = 7, format = 'us') {
+  const d = new Date();
+  d.setDate(d.getDate() + Number(daysAhead || 0));
+  const pad = (n) => String(n).padStart(2, '0');
+  if (format === 'iso') {
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  }
+  return `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear()}`;
 }
 
 /**

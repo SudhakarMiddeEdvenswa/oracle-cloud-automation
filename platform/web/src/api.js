@@ -12,6 +12,7 @@ export const api = {
   flows: () => fetch('/api/flows').then(json),
   flow: (id) => fetch(`/api/flows/${id}`).then(json),
   templateUrl: (id) => `/api/flows/${id}/template`,
+  testdata: () => fetch('/api/testdata').then(json),
   runs: () => fetch('/api/runs').then(json),
   run: (runId) => fetch(`/api/runs/${runId}`).then(json),
   cancel: (runId) => fetch(`/api/runs/${runId}/cancel`, { method: 'POST' }).then(json),

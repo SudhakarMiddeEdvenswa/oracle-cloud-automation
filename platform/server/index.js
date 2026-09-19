@@ -7,6 +7,7 @@ import dotenv from 'dotenv';
 
 import { flowsRouter } from './routes/flows.js';
 import { runsRouter } from './routes/runs.js';
+import { testdataRouter } from './routes/testdata.js';
 import { RunStore } from './runner/RunStore.js';
 
 dotenv.config();
@@ -44,6 +45,7 @@ app.get('/api/health', (req, res) => {
 
 app.use('/api/flows', flowsRouter());
 app.use('/api/runs', runsRouter(store));
+app.use('/api/testdata', testdataRouter());
 
 // Serve the built UI when it exists; otherwise point the user at the dev server.
 if (fs.existsSync(WEB_DIST)) {

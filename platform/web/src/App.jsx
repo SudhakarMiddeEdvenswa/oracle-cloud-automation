@@ -26,6 +26,8 @@ export default function App() {
   const [flow, setFlow] = useState(null);
   const [form, setForm] = useState(INITIAL_FORM);
   const [dataFile, setDataFile] = useState(null);
+  const [testdataFiles, setTestdataFiles] = useState([]);
+  const [dataFileName, setDataFileName] = useState('');
   const [preview, setPreview] = useState(null);
   const [run, setRun] = useState(null);
   const [logLines, setLogLines] = useState([]);
@@ -40,11 +42,17 @@ export default function App() {
     let cancelled = false;
     (async () => {
       try {
-        const [healthBody, flowsBody, runsBody] = await Promise.all([api.health(), api.flows(), api.runs()]);
+        const [healthBody, flowsBody, runsBody, testdataBody] = await Promise.all([
+          api.health(),
+          api.flows(),
+          api.runs(),
+          api.testdata().catch(() => ({ files: [] })),
+        ]);
         if (cancelled) return;
         setHealth(healthBody);
         setFlows(flowsBody.flows);
         setHistory(runsBody.runs);
+        setTestdataFiles(testdataBody.files || []);
         setForm((prev) => ({
           ...prev,
           baseUrl: prev.baseUrl || healthBody.defaults.baseUrl,
@@ -93,9 +101,12 @@ export default function App() {
     body.append('additionalInstructions', form.additionalInstructions);
     body.append('reportFormats', form.reportFormats.join(','));
     body.append('stopOnFirstFailure', String(form.stopOnFirstFailure));
+    // An uploaded file takes precedence; otherwise use the file picked from the
+    // project's testdata folder.
     if (dataFile) body.append('dataFile', dataFile);
+    else if (dataFileName) body.append('dataFileName', dataFileName);
     return body;
-  }, [form, dataFile]);
+  }, [form, dataFile, dataFileName]);
 
   const onPreview = async () => {
     setError('');
@@ -197,6 +208,9 @@ export default function App() {
             setForm={setForm}
             dataFile={dataFile}
             setDataFile={setDataFile}
+            testdataFiles={testdataFiles}
+            dataFileName={dataFileName}
+            setDataFileName={setDataFileName}
             onPreview={onPreview}
             onExecute={onExecute}
             busy={busy}

@@ -8,6 +8,7 @@ import { loadFlow } from '../../../src/core/registry.js';
 import { parseCsv } from '../../../src/core/csv.js';
 import { resolveRow } from '../../../src/core/rowData.js';
 import { REPORT_FORMATS } from '../reporting/index.js';
+import { resolveTestDataFile } from './testdata.js';
 
 // Data files are small; keeping them in memory avoids leaving CSVs with
 // business data lying around in a temp folder.
@@ -64,7 +65,10 @@ export function runsRouter(store) {
 
       const manager = store.start({
         flowId: flow.id,
-        dataFile: { name: req.file?.originalname || 'data.csv', text },
+        dataFile: {
+          name: req.file?.originalname || req.body.dataFileName || 'data.csv',
+          text,
+        },
         instance: { baseUrl: baseUrl.trim(), username: username.trim(), password },
         settings: {
           headless: parseBool(req.body.headless, true),
@@ -172,15 +176,22 @@ export function runsRouter(store) {
   return router;
 }
 
-/** Read the uploaded CSV, or fall back to inline text / the flow's template. */
+/**
+ * Read the data file for a run. Precedence: an uploaded CSV, then a file
+ * selected from the project's testdata folder, then inline text, then the
+ * flow's template.
+ */
 function readDataFile(req) {
   if (req.file?.buffer?.length) return req.file.buffer.toString('utf-8');
+  if (req.body.dataFileName && String(req.body.dataFileName).trim()) {
+    return fs.readFileSync(resolveTestDataFile(req.body.dataFileName), 'utf-8');
+  }
   if (req.body.dataText && String(req.body.dataText).trim()) return String(req.body.dataText);
   if (parseBool(req.body.useTemplate, false)) {
     const flow = loadFlow(req.body.flowId);
     if (flow.templatePath) return fs.readFileSync(flow.templatePath, 'utf-8');
   }
-  const err = new Error('A data file is required: upload a CSV for the selected flow');
+  const err = new Error('A data file is required: upload a CSV or select one from the testdata folder');
   err.status = 400;
   throw err;
 }

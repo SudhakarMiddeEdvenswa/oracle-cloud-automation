@@ -54,21 +54,31 @@ export class RequisitionCheckoutPage extends BasePage {
    */
   async configureRequester(requester) {
     logger.step(13, 'Configure requester');
-    if (requester) {
-      const control = this.page
-        .getByRole('combobox', { name: /Requester/i })
-        .or(this.page.getByLabel(/Requester/i, { exact: false }))
-        .first();
-      if (await control.isVisible().catch(() => false)) {
-        await this.oracle
-          .selectRedwoodCombobox('Requester', requester)
-          .catch(() => logger.warn(`Requester "${requester}" not set; using default`));
-      } else {
-        logger.warn('Requester is not an editable field here; using the default requester');
-      }
-    } else {
-      logger.pass('Using the default requester');
+
+    // No requester in the data: requisition for the logged-in employee (the
+    // flow's documented default). This is a legitimate, explicit choice.
+    if (!requester) {
+      logger.pass('No requester specified; requisitioning for the logged-in user');
+      return;
     }
+
+    // A requester WAS specified, so it must actually be applied — never silently
+    // fall back to the default, which would submit for the wrong person.
+    const control = this.page
+      .getByRole('combobox', { name: /Requester/i })
+      .or(this.page.getByLabel(/Requester/i, { exact: false }))
+      .first();
+    if (!(await control.isVisible().catch(() => false))) {
+      throw new Error(
+        `Requester "${requester}" was specified but the Requester field is not editable on this page`
+      );
+    }
+    await this.oracle.selectRedwoodCombobox('Requester', requester);
+
+    // Assert the selection took effect.
+    const value = ((await control.inputValue().catch(() => '')) || '').trim();
+    expect(value, `Requester should be set to "${requester}"`).toContain(requester);
+    logger.pass(`Requester set to "${requester}"`);
   }
 
   /**

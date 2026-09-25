@@ -47,6 +47,17 @@ export function uniqueRequisitionDescription(prefix) {
 }
 
 /**
+ * Produce a unique purchase-order description from a prefix, e.g.
+ * "AUTO_TEST_PO" -> "AUTO_TEST_PO_20260918123045". The prompt requires a fresh
+ * PO_DESCRIPTION per run so re-executions never collide on the header.
+ * @param {string} prefix
+ * @returns {string}
+ */
+export function uniquePurchaseOrderDescription(prefix) {
+  return uniqueName(prefix);
+}
+
+/**
  * A valid future date (default 7 days ahead) formatted for Oracle date fields.
  * US-shaped pods accept M/D/YYYY; pass format="iso" for YYYY-MM-DD.
  * @param {number} [daysAhead=7]

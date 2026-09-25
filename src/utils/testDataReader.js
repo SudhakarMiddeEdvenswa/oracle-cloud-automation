@@ -137,3 +137,51 @@ function mapRequisitionRow(row) {
 export function getRequisitionTestDataRows(fileName = 'Purchase_Requisition_Data.csv') {
   return readCsvRows(fileName).map(mapRequisitionRow);
 }
+
+/**
+ * Map one indexed CSV row to the flat purchase-order structure the PO page
+ * objects and the create-purchase-order spec consume. Column names match the
+ * create-purchase-order flow.json contract, so the same file drives the web UI
+ * app (specs dropdown) and the standalone Playwright spec.
+ *
+ * `description` is exposed as `descriptionPrefix`, so the spec can append a
+ * per-run timestamp (e.g. "AUTO_TEST_PO_20260918023615") and avoid colliding
+ * with a previous run's header.
+ *
+ * @param {Map<string,string>} row - normalized-key accessor from indexRow()
+ * @returns {object}
+ */
+function mapPurchaseOrderRow(row) {
+  const get = (key) => row.get(key) ?? '';
+  return {
+    descriptionPrefix: get('description') || 'AUTO_TEST_PO',
+    businessUnit: get('businessunit'),
+    supplier: get('supplier'),
+    supplierSite: get('suppliersite'),
+    buyer: get('buyer'),
+    currency: get('currency') || 'USD',
+    lineType: get('linetype') || 'Goods',
+    itemDescription: get('itemdescription'),
+    category: get('category'),
+    quantity: get('quantity') || '1',
+    uom: get('uom'),
+    price: get('price'),
+    // "AUTO" (or blank) means: generate a valid future date at run time.
+    needByDate: get('needbydate'),
+    shipToOrganization: get('shiptoorganization'),
+    shipToLocation: get('shiptolocation'),
+    chargeAccount: get('chargeaccount'),
+    billToLocation: get('billtolocation'),
+    paymentTerms: get('paymentterms'),
+  };
+}
+
+/**
+ * Read purchase-order test cases from a CSV file in the testdata folder. Every
+ * non-empty row is one test case.
+ * @param {string} [fileName="Purchase_Order_Data.csv"]
+ * @returns {object[]} array of purchase-order data objects
+ */
+export function getPurchaseOrderTestDataRows(fileName = 'Purchase_Order_Data.csv') {
+  return readCsvRows(fileName).map(mapPurchaseOrderRow);
+}

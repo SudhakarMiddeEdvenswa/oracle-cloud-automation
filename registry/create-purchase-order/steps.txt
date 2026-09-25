@@ -44,8 +44,12 @@ Add a line and enter:
 Expected: The line is accepted and the order amount reflects quantity times price.
 
 [enter-schedule] Set the schedule details
-Open the line's schedules or distributions and set Need-by Date to {{needByDate}} and Ship-to Location to {{shipToLocation}} if they are not already inherited from the header.
-Expected: The schedule shows the need-by date and ship-to location.
+Open the line's schedules or distributions and set Need-by Date to {{needByDate}}, Ship-to Organization to {{shipToOrganization}} and Ship-to Location to {{shipToLocation}} if they are not already inherited from the header.
+Expected: The schedule shows the need-by date, ship-to organization and ship-to location.
+
+[enter-distribution] Set the distribution details
+Open the line's distributions and set Charge Account to {{chargeAccount}} if it is provided and not already defaulted from the business unit or item.
+Expected: The distribution shows the charge account (defaulted when {{chargeAccount}} is blank).
 
 [save-order] Save the order
 Save the purchase order.

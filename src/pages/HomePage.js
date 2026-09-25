@@ -74,6 +74,24 @@ export class HomePage extends BasePage {
   }
 
   /**
+   * Step 4 (purchase-order flow) — Open Purchase Orders.
+   * Under the expanded Procurement group the entry renders as "Purchase Orders"
+   * on most pods; some label it "Manage Orders".
+   */
+  async goToPurchaseOrders() {
+    logger.step(4, 'Open Purchase Orders');
+    const orders = this.page
+      .getByRole('link', { name: /^Purchase Orders$/i })
+      .or(this.page.getByRole('link', { name: /^Manage Orders$/i }))
+      .first();
+    await orders.waitFor({ state: 'visible' });
+    await orders.scrollIntoViewIfNeeded().catch(() => {});
+    await orders.click({ force: true });
+    await this.waitUntilReady();
+    logger.pass('Purchase Orders page displayed');
+  }
+
+  /**
    * Step 4 (requisition flow) — Open Purchase Requisitions.
    * Under the expanded Procurement group the entry renders as "Purchase
    * Requisitions" on most pods; some label it just "Requisitions".

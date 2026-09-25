@@ -1,0 +1,2 @@
+description,businessUnit,supplier,supplierSite,buyer,currency,lineType,itemDescription,category,quantity,uom,price,needByDate,shipToOrganization,shipToLocation,chargeAccount,billToLocation,paymentTerms
+AUTO_TEST_PO,US1 Business Unit,AUTO_TEST_SUPPLIER,Head Office,,USD,Goods,Automation test item,Miscellaneous,10,Each,100,AUTO,US1 Inventory,Seattle,,,

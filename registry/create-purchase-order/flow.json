@@ -101,10 +101,22 @@
       "example": "AUTO"
     },
     {
+      "name": "shipToOrganization",
+      "label": "Ship-to Organization",
+      "required": false,
+      "example": "US1 Inventory"
+    },
+    {
       "name": "shipToLocation",
       "label": "Ship-to Location",
       "required": true,
       "example": "Seattle"
+    },
+    {
+      "name": "chargeAccount",
+      "label": "Charge Account",
+      "required": false,
+      "note": "Leave blank to accept the account defaulted from the BU / item."
     },
     {
       "name": "billToLocation",
